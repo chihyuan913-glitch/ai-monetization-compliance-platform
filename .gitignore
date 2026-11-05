@@ -1,0 +1,30 @@
+# Python 快取與編譯產物
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+build/
+dist/
+*.egg-info/
+
+# 環境變數與機敏憑證
+.env
+.env.*
+*.env
+!.env.example
+
+# 執行期日誌與暫存
+*.log
+output/web_server.log
+_backup/
+runtime/
+
+# Cloudflare Wrangler 本機快取
+.wrangler/
+
+# 真實客戶訪談與營收資料：僅存本機，不入版控（雲端以 sample_data/ 範例補齊）
+/07_收入成本追蹤表.csv
+output/11_客戶訪談紀錄表.csv
+output/13_客戶需求驗證儀表板.csv
+!sample_data/
+!sample_data/*.csv

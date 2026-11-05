@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: ai-monetization-compliance-platform
+    runtime: python
+    plan: free
+    healthCheckPath: /health
+    buildCommand: pip install -r requirements.txt
+    startCommand: python web_app.py --host 0.0.0.0 --port $PORT --no-browser --no-auto-shutdown
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: AUTO_SHUTDOWN
+        value: "false"
+      - key: PYTHONDONTWRITEBYTECODE
+        value: "1"
+      # 存取保護：密碼由 Render 首次部署時隨機產生，於 Dashboard > Environment 查看；不入版控
+      - key: ACCESS_USER
+        value: chihyuan
+      - key: ACCESS_PASSWORD
+        generateValue: true

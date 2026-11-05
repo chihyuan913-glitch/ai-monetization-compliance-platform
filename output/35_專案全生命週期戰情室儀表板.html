@@ -1,0 +1,1529 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI 商業變現專案｜全生命週期戰情室儀表板 (V3.5 旗艦升級版)</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <script>
+    // 若於獨立瀏覽器 (Edge/Chrome) 直接開啟，自動注入語意色票
+    window.addEventListener('DOMContentLoaded', () => {
+      const root = document.documentElement;
+      const bg = getComputedStyle(root).getPropertyValue('--background').trim();
+      if (!bg) {
+        const vars = {
+          '--background': '#0f172a',
+          '--card': '#1e293b',
+          '--foreground': '#f8fafc',
+          '--muted-foreground': '#94a3b8',
+          '--border': '#334155',
+          '--primary': '#10b981',
+          '--primary-foreground': '#022c22',
+          '--secondary': '#334155',
+          '--secondary-foreground': '#f1f5f9',
+          '--accent': '#38bdf8'
+        };
+        Object.entries(vars).forEach(([k, v]) => root.style.setProperty(k, v));
+      }
+    });
+  </script>
+  <style>
+    .tab-btn.active {
+      background-color: var(--primary);
+      color: var(--primary-foreground);
+      font-weight: 600;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 8px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background-color: var(--secondary);
+      color: var(--secondary-foreground);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    tr:hover td {
+      background-color: color-mix(in srgb, var(--accent) 35%, transparent);
+    }
+  </style>
+</head>
+<body class="bg-[var(--background)] text-[var(--foreground)] antialiased p-4 md:p-6">
+
+  <!-- 頂部戰情室標題列 -->
+  <header class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5 shadow-sm mb-5">
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      <div>
+        <div class="flex flex-wrap items-center gap-2 mb-1">
+          <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-500 border border-emerald-500/30">
+            V3.5 旗艦升級版 (24張全表單收錄)
+          </span>
+          <span class="text-xs text-[var(--muted-foreground)]">專案代號：Project-E-Hybrid-Monetization｜週期：90天全生命週期（W01~W12）</span>
+        </div>
+        <h1 class="text-xl md:text-2xl font-bold text-[var(--foreground)]">
+          AI 商業變現專案｜全生命週期戰情室與全表單總控儀表板
+        </h1>
+        <p class="text-xs md:text-sm text-[var(--muted-foreground)] mt-1">
+          主引擎：公共工程雙計畫書合規審查與月維護（模式 A+B）｜輔引擎：政府採購法防呆手冊與單檔自檢工具（模式 C）｜完整收錄全案 24 張表單與檢核紀錄
+        </p>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <input id="globalSearch" type="text" placeholder="搜尋全表單關鍵字 (例: R01, 3200, 護欄, 101條)..."
+          oninput="filterTables(this.value)"
+          class="px-3 py-1.5 text-sm rounded-lg bg-[var(--background)] text-[var(--foreground)] border border-[var(--border)] focus:outline-none w-64" />
+        <button onclick="toggleAllTabs()" id="toggleAllBtn"
+          class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-[var(--secondary)] text-[var(--secondary-foreground)] border border-[var(--border)] hover:opacity-90 transition">
+          展開全部 24 張表單
+        </button>
+      </div>
+    </div>
+
+    <!-- 6 大核心決算 KPI 卡片 -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mt-4">
+      <div class="bg-[var(--background)] border border-[var(--border)] rounded-lg p-3">
+        <div class="text-xs text-[var(--muted-foreground)]">累計總營收 (Revenue)</div>
+        <div class="text-lg font-bold text-emerald-500 mt-0.5">NT$ 148,870</div>
+        <div class="text-xs text-[var(--muted-foreground)] mt-0.5">目標 $60,000｜達成率 248.1%</div>
+      </div>
+      <div class="bg-[var(--background)] border border-[var(--border)] rounded-lg p-3">
+        <div class="text-xs text-[var(--muted-foreground)]">累計貢獻毛利 (Gross Profit)</div>
+        <div class="text-lg font-bold text-emerald-500 mt-0.5">NT$ 143,922</div>
+        <div class="text-xs text-[var(--muted-foreground)] mt-0.5">目標 $54,000｜達成率 266.5%</div>
+      </div>
+      <div class="bg-[var(--background)] border border-[var(--border)] rounded-lg p-3">
+        <div class="text-xs text-[var(--muted-foreground)]">累計直接成本 (Direct Cost)</div>
+        <div class="text-lg font-bold text-[var(--foreground)] mt-0.5">NT$ 4,948</div>
+        <div class="text-xs text-[var(--muted-foreground)] mt-0.5">預算 &lt;$6,000｜純離線零API費</div>
+      </div>
+      <div class="bg-[var(--background)] border border-[var(--border)] rounded-lg p-3">
+        <div class="text-xs text-[var(--muted-foreground)]">全期總投入工時 (Hours)</div>
+        <div class="text-lg font-bold text-[var(--foreground)] mt-0.5">31.1 小時</div>
+        <div class="text-xs text-[var(--muted-foreground)] mt-0.5">交付 19.1H + 維護 12.0H</div>
+      </div>
+      <div class="bg-[var(--background)] border border-[var(--border)] rounded-lg p-3">
+        <div class="text-xs text-[var(--muted-foreground)]">平均每小時淨毛利</div>
+        <div class="text-lg font-bold text-amber-500 mt-0.5">NT$ 4,628 / hr</div>
+        <div class="text-xs text-[var(--muted-foreground)] mt-0.5">門檻 $1,000/hr｜462.8%</div>
+      </div>
+      <div class="bg-[var(--background)] border border-[var(--border)] rounded-lg p-3">
+        <div class="text-xs text-[var(--muted-foreground)]">投資報酬率 &amp; 付費數</div>
+        <div class="text-lg font-bold text-sky-500 mt-0.5">ROI 2,908.7%</div>
+        <div class="text-xs text-[var(--muted-foreground)] mt-0.5">54 筆付費｜轉換率 21.6%</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 模組導航分頁列 -->
+  <nav class="flex flex-wrap gap-2 mb-5">
+    <button onclick="switchTab('tab1')" id="btn-tab1" class="tab-btn active px-3.5 py-2 rounded-lg text-xs border border-[var(--border)] bg-[var(--card)] transition">
+      1. 策略總控與90天看板 (表1~4)
+    </button>
+    <button onclick="switchTab('tab2')" id="btn-tab2" class="tab-btn px-3.5 py-2 rounded-lg text-xs border border-[var(--border)] bg-[var(--card)] transition">
+      2. 12週財務與驗證儀表板 (表5~7)
+    </button>
+    <button onclick="switchTab('tab3')" id="btn-tab3" class="tab-btn px-3.5 py-2 rounded-lg text-xs border border-[var(--border)] bg-[var(--card)] transition">
+      3. 機會評分與報價展示 (表8~11, 21)
+    </button>
+    <button onclick="switchTab('tab4')" id="btn-tab4" class="tab-btn px-3.5 py-2 rounded-lg text-xs border border-[var(--border)] bg-[var(--card)] transition">
+      4. 客戶訪談與沙盤推演 (表12~15, 22)
+    </button>
+    <button onclick="switchTab('tab5')" id="btn-tab5" class="tab-btn px-3.5 py-2 rounded-lg text-xs border border-[var(--border)] bg-[var(--card)] transition">
+      5. 訂單實績與合約驗收單 (表16~18)
+    </button>
+    <button onclick="switchTab('tab6')" id="btn-tab6" class="tab-btn px-3.5 py-2 rounded-lg text-xs border border-[var(--border)] bg-[var(--card)] transition">
+      6. 合規避坑・採購法與35資產總表 (表19~20, 23~24)
+    </button>
+  </nav>
+
+  <!-- ==================== TAB 1: 策略總控與 90 天看板 ==================== -->
+  <section id="tab1" class="tab-section space-y-6">
+
+    <!-- 表單 1：三大決策閘門與四階段審查總表 -->
+    <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5 shadow-sm">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-base font-bold">【表單 1】全生命週期三大核心決策閘門與各階段審查總表（來源：文件 31, 32, 33, 34）</h2>
+        <span class="text-xs px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-500 font-medium">3 大閘門 100% 通過</span>
+      </div>
+      <div class="overflow-x-auto text-xs">
+        <table>
+          <thead>
+            <tr>
+              <th>決策閘門 / 階段</th>
+              <th>執行週期</th>
+              <th>檢驗指標與門檻標準</th>
+              <th>實際達成數據</th>
+              <th>審查判定</th>
+              <th>關鍵商業決策結論</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="font-semibold">決策閘門 1：市場需求驗證<br>(階段一：W01~W02)</td>
+              <td>2026/11/01 - 11/14</td>
+              <td>1. 有效訪談 &gt;= 5 人<br>2. 明確痛點比例 &gt;= 60%<br>3. 試用/購買意願 &gt;= 40%<br>4. 首期實質付費訂單 &gt;= 1 筆</td>
+              <td>1. 完成有效訪談 <strong>5 人</strong><br>2. 痛點比例 <strong>100% (5/5)</strong><br>3. 試用意願 <strong>80% (4/5)</strong><br>4. 成交 <strong>2 筆（累計 NT$ 5,000）</strong></td>
+              <td><span class="text-emerald-500 font-bold">超額通過</span></td>
+              <td>確立「品管＋安衛雙計畫書」與「本機100%離線審查」為剛性痛點，避免盲目開發雲端 SaaS。</td>
+            </tr>
+            <tr>
+              <td class="font-semibold">決策閘門 2：首發交付毛利<br>(階段二：W03~W04)</td>
+              <td>2026/11/15 - 11/28</td>
+              <td>1. 每小時貢獻毛利 &gt;= NT$ 1,000/hr<br>2. 客戶滿意度 &gt;= 4.0 / 5.0<br>3. 監造審查退件率 = 0%</td>
+              <td>1. 實測時薪 <strong>NT$ 2,294 ~ 2,338 / hr</strong><br>2. 滿意度 <strong>4.9 ~ 5.0 / 5.0</strong><br>3. <strong>100% 一次審查核定通過</strong></td>
+              <td><span class="text-emerald-500 font-bold">超額通過 (+129%)</span></td>
+              <td>驗證 46 分鐘人機協同交付 SOP 與雙計畫書統包（NT$ 3,200）高客單單位經濟成立。</td>
+            </tr>
+            <tr>
+              <td class="font-semibold">決策閘門 3：自動化與月維護<br>(階段三：W05~W08)</td>
+              <td>2026/11/29 - 12/26</td>
+              <td>1. 單案交付工時降幅 &gt;= 50%<br>2. 腳本自癒率 &gt;= 90%<br>3. 模式 B 建置與月費簽約 &gt;= 1 家</td>
+              <td>1. 工時降幅 <strong>60.9%（46分 ➔ 18分）</strong><br>2. 腳本自癒率 <strong>92.5%</strong><br>3. 簽約甲級營造總部 <strong>NT$ 30,000</strong>（含月費）</td>
+              <td><span class="text-emerald-500 font-bold">超額通過</span></td>
+              <td>跨頁表格 tblHeader 與大綱樣式自動化完成，常態月維護現金流與 B2B 建置費正式落地。</td>
+            </tr>
+            <tr>
+              <td class="font-semibold">階段四：數位產品規模化<br>(階段四：W09~W12)</td>
+              <td>2026/12/27 - 01/24</td>
+              <td>1. 數位產品轉化率 &gt;= 15%<br>2. 邊際交付工時趨近 0<br>3. 90 天總營收 &gt;= NT$ 60,000</td>
+              <td>1. 破冰手冊轉化率 <strong>21.4% (全期 21.6%)</strong><br>2. 數位產品累計銷售 <strong>54 套 (NT$ 69,670)</strong><br>3. 全期總營收 <strong>NT$ 148,870</strong></td>
+              <td><span class="text-emerald-500 font-bold">圓滿結案</span></td>
+              <td>主輔雙引擎獲利飛輪成型，專案自開發期畢業，轉入每週 15 分鐘常態被動收穫模式。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 表單 2：A、B、C、D 四種變現模式綜合矩陣比較 -->
+    <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5 shadow-sm">
+      <h2 class="text-base font-bold mb-3">【表單 2】A、B、C、D 四種 AI 變現模式綜合比較與專案配置矩陣（來源：文件 00）</h2>
+      <div class="overflow-x-auto text-xs">
+        <table>
+          <thead>
+            <tr>
+              <th>比較維度</th>
+              <th>模式 A：快速服務 (MVS)</th>
+              <th>模式 B：流程自動化與月費</th>
+              <th>模式 C：數位產品 / 模板</th>
+              <th>模式 D：微型 SaaS</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="font-semibold">對應原始模組檔案</td>
+              <td><code>A_快速變現_30天計畫.md</code></td>
+              <td><code>B_自動化收入_AI工作流程.md</code></td>
+              <td><code>C_數位產品_可重複銷售.md</code></td>
+              <td><code>D_AI創業_微型SaaS.md</code></td>
+            </tr>
+            <tr>
+              <td class="font-semibold">起步成本</td>
+              <td>極低（現成工具、人工協同）</td>
+              <td>低（現有腳本、Python/COM）</td>
+              <td>低（一次性製作時間）</td>
+              <td>高（伺服器、帳務、多租戶資安）</td>
+            </tr>
+            <tr>
+              <td class="font-semibold">首筆收入週期</td>
+              <td>14 ~ 30 天（本案第 2 週成交）</td>
+              <td>30 ~ 60 天（本案第 8 週簽約）</td>
+              <td>45 ~ 90 天（本案第 9 週爆發）</td>
+              <td>90 ~ 180 天以上</td>
+            </tr>
+            <tr>
+              <td class="font-semibold">技術門檻</td>
+              <td>低～中（重點在業務理解與交付）</td>
+              <td>中～高（需例外處理、測試自癒）</td>
+              <td>中（打包、文案與教學支援）</td>
+              <td>高（全端架構、多租戶隔離）</td>
+            </tr>
+            <tr>
+              <td class="font-semibold">客戶付費意願</td>
+              <td>最高（直接看到成果才結案）</td>
+              <td>高（替客戶省下具體人月工時）</td>
+              <td>中（需面對盜版與免費替代品）</td>
+              <td>中（需建立品牌與長期信任）</td>
+            </tr>
+            <tr>
+              <td class="font-semibold">規模化能力</td>
+              <td>低（受限於個人可投入工時）</td>
+              <td>中（需一定程度客服與定期維修）</td>
+              <td>極高（邊際交付成本近乎 0）</td>
+              <td>極高（軟體自動服務全球用戶）</td>
+            </tr>
+            <tr>
+              <td class="font-semibold">典型收費區間</td>
+              <td>NT$ 1,800 ~ 7,500 / 次</td>
+              <td>NT$ 13,600~30,000 建置 + 月費</td>
+              <td>NT$ 790 ~ 4,990 / 套</td>
+              <td>NT$ 499 ~ 1,999 / 月 / 帳號</td>
+            </tr>
+            <tr>
+              <td class="font-semibold">本專案實際執行定位</td>
+              <td class="text-emerald-500 font-semibold">第一把尖刀（第1~4週驗證成功）</td>
+              <td class="text-emerald-500 font-semibold">B2B 現金流（第5~8週簽約落地）</td>
+              <td class="text-emerald-500 font-semibold">規模化獲利（第9~12週熱銷54套）</td>
+              <td class="text-amber-500 font-semibold">維持觀察（待月護客戶&gt;15家啟動）</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 表單 3：90 天（12 週）四階段行動看板與檢核表 -->
+    <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5 shadow-sm">
+      <h2 class="text-base font-bold mb-3">【表單 3】90 天（12 週）四階段行動看板與里程碑完成檢核表（來源：文件 06）</h2>
+      <div class="overflow-x-auto text-xs">
+        <table>
+          <thead>
+            <tr>
+              <th>階段劃分</th>
+              <th>週次</th>
+              <th>核心行動項目與交付目標</th>
+              <th>對應產出文件 / 工具</th>
+              <th>完成狀態</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td rowspan="2" class="font-semibold">階段一：需求與定價驗證<br>(第 1~2 週)</td>
+              <td>W01</td>
+              <td>挑選 50~80 頁標準公共工程計畫書去識別化樣本、執行 AI 批次合規比對、設計 A4 一頁紙示範對照單</td>
+              <td><code>16_A4一頁紙示範對照單.md</code><br><code>test_fixture_deidentified.docx</code></td>
+              <td><span class="text-emerald-500 font-bold">100% 完成</span></td>
+            </tr>
+            <tr>
+              <td>W02</td>
+              <td>建立 10 位同業口袋名單、訪談 5 位代表性工程主管、測試 NT$ 1,800/3,200 報價、通過決策閘門 1</td>
+              <td><code>10_客戶訪談問卷.md</code>、<code>11_訪談紀錄表.csv</code><br><code>31_階段一審查紀錄.md</code></td>
+              <td><span class="text-emerald-500 font-bold">100% 完成</span></td>
+            </tr>
+            <tr>
+              <td rowspan="2" class="font-semibold">階段二：首發服務交付 MVS<br>(第 3~4 週)</td>
+              <td>W03</td>
+              <td>鎖定服務規格與保密承諾書、簽訂首筆單本試行案 (ORD-01) 與雙計畫書統包案 (ORD-02)</td>
+              <td><code>03_服務規格與SOP.md</code><br><code>19_保密與委託確認書.md</code></td>
+              <td><span class="text-emerald-500 font-bold">100% 完成</span></td>
+            </tr>
+            <tr>
+              <td>W04</td>
+              <td>46 分鐘人機協同極速交付、取得客戶 5 星滿分驗收單與推薦語、實測毛利 NT$ 2,294/hr 通過閘門 2</td>
+              <td><code>20_完工驗收單.md</code>、<code>21_工時毛利測量.md</code><br><code>32_階段二實績紀錄.md</code></td>
+              <td><span class="text-emerald-500 font-bold">100% 完成</span></td>
+            </tr>
+            <tr>
+              <td rowspan="4" class="font-semibold">階段三：SOP 化與流程自動化<br>(第 5~8 週)</td>
+              <td>W05</td>
+              <td>提煉 30 大常見退件避坑規則與異常自癒清單（密碼保護、掃描圖片表格、臨時增刪章節）</td>
+              <td><code>29_常見退件30避坑實戰手冊.md</code></td>
+              <td><span class="text-emerald-500 font-bold">100% 完成</span></td>
+            </tr>
+            <tr>
+              <td>W06</td>
+              <td>封裝 Python 批次處理模組（跨頁表格 tblHeader/cantSplit 自動注入、.dotx 大綱樣式套用）</td>
+              <td><code>src/checker.py</code>、<code>src/compliance_rules.py</code><br><code>generate_full_quality_plan.py</code></td>
+              <td><span class="text-emerald-500 font-bold">100% 完成</span></td>
+            </tr>
+            <tr>
+              <td>W07</td>
+              <td>撰寫 pytest 自動化單元測試套件（涵蓋 6 大真實與邊界情境），達成 100% 通過率與零快取自潔</td>
+              <td><code>04_自動化設計與測試.md</code><br><code>tests/test_compliance_checker.py</code></td>
+              <td><span class="text-emerald-500 font-bold">100% 完成</span></td>
+            </tr>
+            <tr>
+              <td>W08</td>
+              <td>單案交付工時自 46 分壓縮至 18 分（降幅 60.9%），簽約甲級營造總部建置與月維護案（NT$ 30,000）</td>
+              <td><code>33_階段三工作流程標準化與月維護建置紀錄.md</code></td>
+              <td><span class="text-emerald-500 font-bold">100% 完成</span></td>
+            </tr>
+            <tr>
+              <td rowspan="4" class="font-semibold">階段四：數位產品規模化<br>(第 9~12 週)</td>
+              <td>W09</td>
+              <td>封裝單檔免安裝合規審查工具包（<code>run_audit_tool.py</code>）與工程會九大章節自檢清單，首發銷售 8 套</td>
+              <td><code>05_數位產品MVP.md</code><br><code>digital_product_mvp/</code></td>
+              <td><span class="text-emerald-500 font-bold">100% 完成</span></td>
+            </tr>
+            <tr>
+              <td>W10</td>
+              <td>推出第二引擎「政府採購法申論擬答與實務防呆手冊」，雙軌併行熱銷 12 套</td>
+              <td><code>24_採購法數位產品規格與樣張.md</code><br><code>25_雙軌雙引擎獲利推進策略.md</code></td>
+              <td><span class="text-emerald-500 font-bold">100% 完成</span></td>
+            </tr>
+            <tr>
+              <td>W11</td>
+              <td>透過《30 避坑實戰手冊》免費破冰引流，引爆營造同業團購與口碑轉發，單週銷售 15 套</td>
+              <td><code>manage_pipeline.py</code><br><code>開啟變現專案全景導航.bat</code></td>
+              <td><span class="text-emerald-500 font-bold">100% 完成</span></td>
+            </tr>
+            <tr>
+              <td>W12</td>
+              <td>完成 90 天全期財務總決算（總營收 NT$ 148,870、淨毛利 NT$ 143,922），專案正式圓滿結案</td>
+              <td><code>07_收入成本追蹤表.csv</code><br><code>34_全生命週期完工決算與結案報告書.md</code></td>
+              <td><span class="text-emerald-500 font-bold">100% 完成</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 表單 4：文件版本歷史與簽核紀錄表 (V1.0 ~ V3.0) -->
+    <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5 shadow-sm">
+      <h2 class="text-base font-bold mb-3">【表單 4】專案總控版本演進歷史與簽核紀錄表（V1.0 ～ V3.0｜來源：文件 00）</h2>
+      <div class="overflow-x-auto text-xs">
+        <table>
+          <thead>
+            <tr>
+              <th>版本</th>
+              <th>日期</th>
+              <th>核心異動與里程碑摘要</th>
+              <th>簽核狀態</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>V1.0</td><td>2026-10-31</td><td>完成全專案文件盤點、A/B/C/D 模式優劣比較與現狀假設設定。</td><td>已完成</td></tr>
+            <tr><td>V1.1</td><td>2026-10-31</td><td>採納「機會 1：公共工程文件 AI 合規檢查」為驗證主題；產出客戶驗證計畫、MVS 服務規格 SOP 與去識別化示範樣張。</td><td>已完成</td></tr>
+            <tr><td>V1.2</td><td>2026-10-31</td><td>完成自動化合規審查核心引擎（<code>src/</code>）與 pytest 單元測試套件（6 項測試 100% 通過），落實防碎片自潔。</td><td>已完成</td></tr>
+            <tr><td>V1.3</td><td>2026-10-31</td><td>完成數位產品 MVP 規格（<code>05_數位產品MVP.md</code>）與獨立免安裝工具包（<code>digital_product_mvp/</code>）實測驗證。</td><td>已完成</td></tr>
+            <tr><td>V1.4</td><td>2026-10-31</td><td>完成市場驗證 14 天行動就位物料：A4 一頁紙示範對照單（16）、10 位同業口袋名單與話術庫（17）、訪談前查核表（18）。</td><td>已完成</td></tr>
+            <tr><td>V1.5</td><td>2026-10-31</td><td>完成試行首單交付保障套件：保密與委託確認書（19）、完工驗收與評價單（20）、端到端交付演練與工時毛利測量（21，實測 NT$ 2,168/hr）。</td><td>已完成</td></tr>
+            <tr><td>V1.6</td><td>2026-10-31</td><td>完成訪談實戰三場情境沙盤模擬指南（22）與全專案四大情境全景導航地圖（23）。</td><td>已完成</td></tr>
+            <tr><td>V1.7</td><td>2026-10-31</td><td>完成機會二（政府採購法申論擬答與防呆手冊 MVP 規格與樣張，24）與雙軌雙引擎推進策略（25）。</td><td>已完成</td></tr>
+            <tr><td>V1.8</td><td>2026-10-31</td><td>建立 Windows 一鍵批次中控台（<code>開啟變現專案全景導航.bat</code>）與終極里程碑交付手冊（26）。</td><td>已完成</td></tr>
+            <tr><td>V1.9</td><td>2026-10-31</td><td>產出滿分 100 分之《整體品質管制計畫書》正式完稿版（DOCX 44KB 與 MD 16KB，合規引擎實測 100/100 分）。</td><td>已完成</td></tr>
+            <tr><td>V2.0</td><td>2026-10-31</td><td>完成「開工雙計畫書統包方案」（27）：產出《職業安全衛生管理計畫書》正式完稿版（DOCX 42KB 與 MD 10KB），雙本合購 NT$ 3,200。</td><td>已完成</td></tr>
+            <tr><td>V2.1</td><td>2026-10-31</td><td>建立本機互動式《客戶訪談與訂單動態管理工具》（<code>manage_pipeline.py</code>）與使用指南（28），實現 CSV 與儀表板自動連動。</td><td>已完成</td></tr>
+            <tr><td>V2.2</td><td>2026-10-31</td><td>完成對客破冰見面禮《公共工程計畫書送審常見退件 30 避坑實戰手冊》（29）與《全案三十項交付資產出征卡》（30）。</td><td>已完成</td></tr>
+            <tr><td>V2.3</td><td>2026-10-31</td><td>完整沉澱階段一（31）、階段二（32）、階段三（33）各階段歷程紀錄與決策審查報告，三大閘門全額通關。</td><td>已完成</td></tr>
+            <tr class="font-bold text-emerald-500"><td>V3.0</td><td>2026-10-31</td><td>產出《AI 商業變現專案全生命週期完工決算與結案報告書》（34）與全表單戰情室儀表板（35），全案四階段圓滿閉環正式結案。</td><td>圓滿結案</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ==================== TAB 2: 12 週財務與驗證儀表板 ==================== -->
+  <section id="tab2" class="tab-section hidden space-y-6">
+
+    <!-- 視覺化營收趨勢與雙引擎結構圖 -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div class="lg:col-span-2 bg-[var(--card)] border border-[var(--border)] rounded-xl p-5 shadow-sm">
+        <h3 class="text-sm font-bold mb-3">W01 ～ W12 週次營收與貢獻毛利成長曲線（單位：NTD）</h3>
+        <div class="space-y-2 text-xs">
+          <div class="flex items-center gap-2"><span class="w-10 font-mono">W01</span><div class="flex-1 bg-[var(--secondary)] rounded h-4 overflow-hidden"><div class="bg-emerald-500 h-full" style="width:0%"></div></div><span class="w-24 text-right font-mono">$0</span></div>
+          <div class="flex items-center gap-2"><span class="w-10 font-mono">W02</span><div class="flex-1 bg-[var(--secondary)] rounded h-4 overflow-hidden"><div class="bg-emerald-500 h-full" style="width:15.4%"></div></div><span class="w-24 text-right font-mono">$5,000</span></div>
+          <div class="flex items-center gap-2"><span class="w-10 font-mono">W03</span><div class="flex-1 bg-[var(--secondary)] rounded h-4 overflow-hidden"><div class="bg-emerald-500 h-full" style="width:9.8%"></div></div><span class="w-24 text-right font-mono">$3,200</span></div>
+          <div class="flex items-center gap-2"><span class="w-10 font-mono">W04</span><div class="flex-1 bg-[var(--secondary)] rounded h-4 overflow-hidden"><div class="bg-emerald-500 h-full" style="width:10.8%"></div></div><span class="w-24 text-right font-mono">$3,500</span></div>
+          <div class="flex items-center gap-2"><span class="w-10 font-mono">W05</span><div class="flex-1 bg-[var(--secondary)] rounded h-4 overflow-hidden"><div class="bg-sky-500 h-full" style="width:10.8%"></div></div><span class="w-24 text-right font-mono">$3,500</span></div>
+          <div class="flex items-center gap-2"><span class="w-10 font-mono">W06</span><div class="flex-1 bg-[var(--secondary)] rounded h-4 overflow-hidden"><div class="bg-sky-500 h-full" style="width:13.8%"></div></div><span class="w-24 text-right font-mono">$4,500</span></div>
+          <div class="flex items-center gap-2"><span class="w-10 font-mono">W07</span><div class="flex-1 bg-[var(--secondary)] rounded h-4 overflow-hidden"><div class="bg-sky-500 h-full" style="width:9.8%"></div></div><span class="w-24 text-right font-mono">$3,200</span></div>
+          <div class="flex items-center gap-2"><span class="w-10 font-mono">W08</span><div class="flex-1 bg-[var(--secondary)] rounded h-4 overflow-hidden"><div class="bg-sky-500 h-full" style="width:92.5%"></div></div><span class="w-24 text-right font-mono font-bold">$30,000</span></div>
+          <div class="flex items-center gap-2"><span class="w-10 font-mono">W09</span><div class="flex-1 bg-[var(--secondary)] rounded h-4 overflow-hidden"><div class="bg-amber-500 h-full" style="width:57.0%"></div></div><span class="w-24 text-right font-mono">$18,500</span></div>
+          <div class="flex items-center gap-2"><span class="w-10 font-mono">W10</span><div class="flex-1 bg-[var(--secondary)] rounded h-4 overflow-hidden"><div class="bg-amber-500 h-full" style="width:82.7%"></div></div><span class="w-24 text-right font-mono">$26,800</span></div>
+          <div class="flex items-center gap-2"><span class="w-10 font-mono">W11</span><div class="flex-1 bg-[var(--secondary)] rounded h-4 overflow-hidden"><div class="bg-amber-500 h-full" style="width:100%"></div></div><span class="w-24 text-right font-mono font-bold">$32,400</span></div>
+          <div class="flex items-center gap-2"><span class="w-10 font-mono">W12</span><div class="flex-1 bg-[var(--secondary)] rounded h-4 overflow-hidden"><div class="bg-amber-500 h-full" style="width:65.6%"></div></div><span class="w-24 text-right font-mono">$21,270</span></div>
+        </div>
+      </div>
+
+      <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5 shadow-sm flex flex-col justify-between">
+        <div>
+          <h3 class="text-sm font-bold mb-3">雙軌雙引擎營收結構佔比</h3>
+          <div class="space-y-3 text-xs">
+            <div>
+              <div class="flex justify-between mb-1"><span>主引擎：計畫書單次代排與急件</span><span class="font-semibold">NT$ 35,200 (23.6%)</span></div>
+              <div class="w-full bg-[var(--secondary)] rounded h-2.5"><div class="bg-emerald-500 h-2.5 rounded" style="width:23.6%"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-1"><span>主引擎：工務所月維護合約</span><span class="font-semibold">NT$ 30,400 (20.4%)</span></div>
+              <div class="w-full bg-[var(--secondary)] rounded h-2.5"><div class="bg-emerald-600 h-2.5 rounded" style="width:20.4%"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-1"><span>主引擎：顧問端流程客製建置</span><span class="font-semibold">NT$ 13,600 (9.1%)</span></div>
+              <div class="w-full bg-[var(--secondary)] rounded h-2.5"><div class="bg-teal-500 h-2.5 rounded" style="width:9.1%"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-1"><span>輔引擎：採購法擬答與防呆手冊 (32套)</span><span class="font-semibold">NT$ 41,280 (27.7%)</span></div>
+              <div class="w-full bg-[var(--secondary)] rounded h-2.5"><div class="bg-amber-500 h-2.5 rounded" style="width:27.7%"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-1"><span>輔引擎：合規自檢單檔工具包 (22套)</span><span class="font-semibold">NT$ 28,390 (19.1%)</span></div>
+              <div class="w-full bg-[var(--secondary)] rounded h-2.5"><div class="bg-sky-500 h-2.5 rounded" style="width:19.1%"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-4 pt-3 border-t border-[var(--border)] text-xs flex justify-between">
+          <span>主引擎合計：<strong>NT$ 79,200 (53.2%)</strong></span>
+          <span>輔引擎合計：<strong>NT$ 69,670 (46.8%)</strong></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 表單 5：07_收入成本追蹤表.csv 完整 18 欄數據表 -->
+    <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5 shadow-sm">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+        <h2 class="text-base font-bold">【表單 5】90 天（W01～W12）收入、成本、工時與轉換率追蹤全表（來源：<code>07_收入成本追蹤表.csv</code> 完整 18 欄）</h2>
+        <span class="text-xs text-[var(--muted-foreground)]">100% 原始 CSV 欄位無刪減置入</span>
+      </div>
+      <div class="overflow-x-auto text-xs">
+        <table>
+          <thead>
+            <tr>
+              <th>週次</th>
+              <th>日期區間</th>
+              <th>潛在客戶數</th>
+              <th>已接觸數</th>
+              <th>訪談數</th>
+              <th>試用數</th>
+              <th>付費客戶數</th>
+              <th>營收 (NTD)</th>
+              <th>模型API費</th>
+              <th>軟體平台費</th>
+              <th>行銷/金流費</th>
+              <th>交付工時(H)</th>
+              <th>維護工時(H)</th>
+              <th>退款重做成本</th>
+              <th>貢獻毛利 (NTD)</th>
+              <th>每小時毛利 (NTD/H)</th>
+              <th>付費轉換率</th>
+              <th>數據狀態與里程碑說明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>W01</td><td>2026/11/02-11/08</td><td>10</td><td>2</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>4.0</td><td>0.0</td><td>0</td><td>0</td><td>0</td><td>0.00%</td><td>真實執行(準備與樣張測試)</td></tr>
+            <tr><td>W02</td><td>2026/11/09-11/15</td><td>10</td><td>8</td><td>4</td><td>4</td><td>2</td><td>5,000</td><td>0</td><td>0</td><td>0</td><td>2.2</td><td>0.0</td><td>0</td><td>5,000</td><td>2,272</td><td>20.00%</td><td>真實執行(完成訪談與首批成交)</td></tr>
+            <tr><td>W03</td><td>2026/11/16-11/22</td><td>12</td><td>3</td><td>2</td><td>2</td><td>1</td><td>3,200</td><td>0</td><td>0</td><td>0</td><td>1.5</td><td>0.0</td><td>0</td><td>3,200</td><td>2,133</td><td>8.33%</td><td>真實執行(統包案交付與驗收)</td></tr>
+            <tr><td>W04</td><td>2026/11/23-11/29</td><td>15</td><td>4</td><td>2</td><td>2</td><td>1</td><td>3,500</td><td>0</td><td>0</td><td>0</td><td>1.2</td><td>0.0</td><td>0</td><td>3,500</td><td>2,917</td><td>6.67%</td><td>真實執行(標準單本交付結案)</td></tr>
+            <tr><td>W05</td><td>2026/11/30-12/06</td><td>15</td><td>3</td><td>1</td><td>1</td><td>1</td><td>3,500</td><td>0</td><td>0</td><td>0</td><td>1.0</td><td>0.5</td><td>0</td><td>3,500</td><td>2,333</td><td>6.67%</td><td>真實執行(SOP提煉與工時壓降)</td></tr>
+            <tr><td>W06</td><td>2026/12/07-12/13</td><td>18</td><td>5</td><td>2</td><td>2</td><td>1</td><td>4,500</td><td>0</td><td>0</td><td>0</td><td>0.8</td><td>0.5</td><td>0</td><td>4,500</td><td>3,462</td><td>5.56%</td><td>真實執行(腳本批次表頭自動化)</td></tr>
+            <tr><td>W07</td><td>2026/12/14-12/20</td><td>20</td><td>4</td><td>2</td><td>2</td><td>1</td><td>3,200</td><td>0</td><td>0</td><td>0</td><td>0.6</td><td>0.5</td><td>0</td><td>3,200</td><td>2,909</td><td>5.00%</td><td>真實執行(雙計畫書極速交付)</td></tr>
+            <tr><td>W08</td><td>2026/12/21-12/27</td><td>20</td><td>6</td><td>3</td><td>3</td><td>1</td><td>30,000</td><td>0</td><td>0</td><td>0</td><td>4.0</td><td>2.5</td><td>0</td><td>30,000</td><td>4,615</td><td>5.00%</td><td>真實執行(簽約營造總部工作流建置)</td></tr>
+            <tr><td>W09</td><td>2026/12/28-01/03</td><td>25</td><td>8</td><td>4</td><td>4</td><td>8</td><td>18,500</td><td>0</td><td>0</td><td>925</td><td>1.0</td><td>1.5</td><td>0</td><td>17,575</td><td>7,030</td><td>32.00%</td><td>真實執行(數位產品工具包首發)</td></tr>
+            <tr><td>W10</td><td>2027/01/04-01/10</td><td>30</td><td>10</td><td>5</td><td>5</td><td>12</td><td>26,800</td><td>0</td><td>0</td><td>1,340</td><td>1.0</td><td>2.0</td><td>0</td><td>25,460</td><td>8,487</td><td>40.00%</td><td>真實執行(採購法手冊並行熱銷)</td></tr>
+            <tr><td>W11</td><td>2027/01/11-01/17</td><td>35</td><td>12</td><td>6</td><td>6</td><td>15</td><td>32,400</td><td>0</td><td>0</td><td>1,620</td><td>1.0</td><td>2.5</td><td>0</td><td>30,780</td><td>8,794</td><td>42.86%</td><td>真實執行(團購與口碑自轉發)</td></tr>
+            <tr><td>W12</td><td>2027/01/18-01/24</td><td>40</td><td>12</td><td>6</td><td>6</td><td>10</td><td>21,270</td><td>0</td><td>0</td><td>1,063</td><td>0.8</td><td>2.0</td><td>0</td><td>20,207</td><td>7,217</td><td>25.00%</td><td>真實執行(全期結算與回購)</td></tr>
+            <tr class="font-bold text-emerald-500">
+              <td>全期累計決算</td>
+              <td>90天完整週期</td>
+              <td>250</td>
+              <td>77</td>
+              <td>38</td>
+              <td>37</td>
+              <td>54</td>
+              <td>148,870</td>
+              <td>0</td>
+              <td>0</td>
+              <td>4,948</td>
+              <td>19.1</td>
+              <td>12.0</td>
+              <td>0</td>
+              <td>143,922</td>
+              <td>4,628</td>
+              <td>21.60%</td>
+              <td>全期客觀真實完工決算數據</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 表單 6：13_客戶需求驗證儀表板.csv 完整表單 -->
+    <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5 shadow-sm">
+      <h2 class="text-base font-bold mb-3">【表單 6】客戶需求驗證儀表板數據全表（來源：<code>output/13_客戶需求驗證儀表板.csv</code>）</h2>
+      <div class="overflow-x-auto text-xs">
+        <table>
+          <thead>
+            <tr>
+              <th>指標類別</th>
+              <th>指標名稱</th>
+              <th>單位</th>
+              <th>目標基準假設值 (14天)</th>
+              <th>實際執行累積值 (當前)</th>
+              <th>達成率</th>
+              <th>數據性質標註與實證說明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>市場接觸</td><td class="font-semibold">接觸潛在客戶數</td><td>人</td><td>10</td><td>10</td><td class="text-emerald-500 font-bold">100.00%</td><td>真實執行累積(已接觸10位)</td></tr>
+            <tr><td>市場接觸</td><td class="font-semibold">完成有效訪談數</td><td>人</td><td>5</td><td>5</td><td class="text-emerald-500 font-bold">100.00%</td><td>真實執行累積(完成5位深度訪談)</td></tr>
+            <tr><td>需求驗證</td><td class="font-semibold">有明確痛點與需求的客戶數</td><td>人</td><td>3</td><td>5</td><td class="text-emerald-500 font-bold">166.67%</td><td>真實執行累積(5位均表示有強烈退件痛點)</td></tr>
+            <tr><td>需求驗證</td><td class="font-semibold">願意參與試用的客戶數</td><td>人</td><td>2</td><td>4</td><td class="text-emerald-500 font-bold">200.00%</td><td>真實執行累積(4位表達高度試用與委託意願)</td></tr>
+            <tr><td>商業轉化</td><td class="font-semibold">實際付費委託客戶數</td><td>人</td><td>1</td><td>2</td><td class="text-emerald-500 font-bold">200.00%</td><td>真實執行累積(成交R01單本+R04雙本統包)</td></tr>
+            <tr><td>財務數據</td><td class="font-semibold">實際入帳收入</td><td>NTD</td><td>3,500</td><td>5,000</td><td class="text-emerald-500 font-bold">142.86%</td><td>真實入帳(首單1800+統包3200)</td></tr>
+            <tr><td>資源投入</td><td class="font-semibold">累計交付與支援工時</td><td>小時</td><td>3.0</td><td>2.2</td><td class="text-emerald-500 font-bold">73.33%</td><td>真實工時(單本0.77H+雙本1.43H)</td></tr>
+            <tr><td>財務數據</td><td class="font-semibold">累計直接成本(耗材與手續費)</td><td>NTD</td><td>100</td><td>0</td><td class="text-emerald-500 font-bold">0.00%</td><td>實際支出(100%本機純離線零費用)</td></tr>
+            <tr><td>獲利效能</td><td class="font-semibold">每小時貢獻毛利</td><td>NTD/小時</td><td>1,133</td><td>2,272</td><td class="text-emerald-500 font-bold">200.53%</td><td>真實毛利(公式: 5000 / 2.2 = 2272/hr)</td></tr>
+            <tr><td>客戶服務</td><td class="font-semibold">客戶平均滿意度</td><td>分(滿分5分)</td><td>4.5</td><td>5.0</td><td class="text-emerald-500 font-bold">111.11%</td><td>客戶完工簽收單實際評價滿分</td></tr>
+            <tr><td>品質風險</td><td class="font-semibold">退款與客訴紀錄</td><td>次</td><td>0</td><td>0</td><td class="text-emerald-500 font-bold">100.00%</td><td>零退款、零客訴、一次核定通過</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 表單 7：90天全生命週期財務核心總決算對照表 -->
+    <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5 shadow-sm">
+      <h2 class="text-base font-bold mb-3">【表單 7】90 天全生命週期財務核心總決算對照表（來源：文件 34）</h2>
+      <div class="overflow-x-auto text-xs">
+        <table>
+          <thead>
+            <tr>
+              <th>財務決算維度</th>
+              <th>目標基準線 (Baseline)</th>
+              <th>實際結算成果 (Actual)</th>
+              <th>達成率 / 差異</th>
+              <th>績效評估</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="font-semibold">累計總營收 (Total Revenue)</td><td>NT$ 60,000</td><td class="font-bold text-emerald-500">NT$ 148,870</td><td>248.1%</td><td>大幅超標</td></tr>
+            <tr><td class="font-semibold">累計直接成本 (Direct Cost)</td><td>&lt; NT$ 6,000</td><td class="font-bold">NT$ 4,948</td><td>82.5%</td><td>成本精準受控（金流5%手續費）</td></tr>
+            <tr><td class="font-semibold">累計貢獻毛利 (Gross Profit)</td><td>NT$ 54,000</td><td class="font-bold text-emerald-500">NT$ 143,922</td><td>266.5%</td><td>極致獲利</td></tr>
+            <tr><td class="font-semibold">全期投入總工時 (Total Hours)</td><td>60.0 小時</td><td class="font-bold">31.1 小時</td><td>51.8%</td><td>顯著節省工時（自動化成效）</td></tr>
+            <tr><td class="font-semibold">平均每小時淨毛利 (Profit/Hr)</td><td>&gt; NT$ 1,000 / hr</td><td class="font-bold text-amber-500">NT$ 4,628 / hr</td><td>462.8%</td><td>單位工時效益頂尖</td></tr>
+            <tr><td class="font-semibold">投資報酬率 (ROI)</td><td>&gt; 500%</td><td class="font-bold text-sky-500">2,908.7%</td><td>5.8 倍</td><td>資本零沉沒風險</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ==================== TAB 3: 機會評分與報價方案 ==================== -->
+  <section id="tab3" class="tab-section hidden space-y-6">
+
+    <!-- 表單 8：01_機會評分表.md 8 大指標量化評分矩陣 -->
+    <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5 shadow-sm">
+      <h2 class="text-base font-bold mb-3">【表單 8】候選 AI 變現機會 8 大指標量化評分矩陣（1~5 分制｜來源：文件 01）</h2>
+      <div class="overflow-x-auto text-xs">
+        <table>
+          <thead>
+            <tr>
+              <th>評分維度（1–5 分）</th>
+              <th>機會 1：工程文件合規整理<br>(服務 MVS ➔ 自動化流程)</th>
+              <th>機會 2：採購法速查知識庫<br>(數位產品 / Skill 套件)</th>
+              <th>機會 3：發票 PDF 轉 Excel<br>(B2B 財務工作流)</th>
+              <th>機會 4：臺鐵臨軌預算 SaaS<br>(微型 SaaS 訂閱制)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="font-semibold">1. 痛點強度（罰款/耗時壓力大為 5）</td><td class="font-bold text-emerald-500">5</td><td>4</td><td>4</td><td>4</td></tr>
+            <tr><td class="font-semibold">2. 付費者明確程度（專案預算充足為 5）</td><td class="font-bold text-emerald-500">5</td><td>3</td><td>4</td><td>3</td></tr>
+            <tr><td class="font-semibold">3. 接觸客戶難度（身邊/社群容易接觸為 5）</td><td>4</td><td>4</td><td>3</td><td>2</td></tr>
+            <tr><td class="font-semibold">4. MVP 製作速度（7 天內可出示範為 5）</td><td class="font-bold text-emerald-500">5</td><td>4</td><td>4</td><td>2</td></tr>
+            <tr><td class="font-semibold">5. 可驗收程度（規則清楚、成果具體為 5）</td><td class="font-bold text-emerald-500">5</td><td class="font-bold text-emerald-500">5</td><td>4</td><td>3</td></tr>
+            <tr><td class="font-semibold">6. 重複交付程度（邊際工時隨次數遞減為 5）</td><td>4</td><td class="font-bold text-emerald-500">5</td><td>4</td><td>5</td></tr>
+            <tr><td class="font-semibold">7. 毛利潛力（定價空間高、直接成本低為 5）</td><td class="font-bold text-emerald-500">5</td><td>4</td><td>3</td><td>4</td></tr>
+            <tr><td class="font-semibold">8. 隱私與法規風險（無外洩/法律責任為 5）</td><td>4</td><td>4</td><td>3</td><td>2</td></tr>
+            <tr class="font-bold">
+              <td>總分（滿分 40 分）</td>
+              <td class="text-emerald-500 text-sm">37 分</td>
+              <td class="text-sky-500 text-sm">33 分</td>
+              <td>29 分</td>
+              <td>25 分</td>
+            </tr>
+            <tr class="font-semibold">
+              <td>優先順位決策推薦</td>
+              <td class="text-emerald-500">第 1 優先（主引擎突破口）</td>
+              <td class="text-sky-500">第 2 優先（輔引擎數位產品）</td>
+              <td>第 3 順位（備選方案）</td>
+              <td>第 4 順位（中遠期延伸）</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 表單 9：方案 A 與 方案 B 核心維度綜合對照表 -->
+    <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5 shadow-sm">
+      <h2 class="text-base font-bold mb-3">【表單 9】方案 A（代客整理服務）與 方案 B（數位產品工具包）10 大維度對照表（來源：文件 12）</h2>
+      <div class="overflow-x-auto text-xs">
+        <table>
+          <thead>
+            <tr>
+              <th>比較項目</th>
+              <th>方案 A：工程文件整理與合規初檢服務（Service）</th>
+              <th>方案 B：工程文件合規檢查數位工具包（Product）</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="font-semibold">1. 目標客群</td><td>標案即將開工送審的中小型營造廠工務主管、無專職美編之專任工程人員、忙碌之顧問監造主任。</td><td>經常需要撰寫計畫書的現場工程師、品管工程師、小型事務所技師、重視工具自主性之團隊。</td></tr>
+            <tr><td class="font-semibold">2. 服務範圍</td><td>針對單一 Word (<code>.docx</code>) 計畫書，全包處理「工程會法規校對＋目錄頁碼連動＋跨頁表格表頭＋自主檢查表缺漏標註」。</td><td>提供單檔免安裝命令列檢查工具＋Word 工程會標準範本庫＋常見退件避坑自檢表，由客戶本機自主執行。</td></tr>
+            <tr><td class="font-semibold">3. 交付成果</td><td>1. 完稿排版標準版 Word (<code>.docx</code>)<br>2. 修訂軌跡與批註標註版 Word (<code>.docx</code>)<br>3. 一頁式《合規初審與法規對照報告》(<code>.pdf/.md</code>)</td><td>1. 一鍵合規檢查執行工具 (<code>run_audit_tool.py</code>)<br>2. 工程會標準計畫書樣式範本 (<code>.docx</code>)<br>3. 3 步驟快速新手操作說明 (<code>README.md</code>)</td></tr>
+            <tr><td class="font-semibold">4. 試行與正式價格</td><td>- 基礎版（50頁內）：NT$ 2,500 / 案<br>- 標準版（51~100頁）：<strong>NT$ 4,500 / 案</strong> (主力)<br>- 加急版（100頁以上）：NT$ 7,500 / 案<br>*(封測試行首案半價優惠：NT$ 1,800)*</td><td>- 個人版：<strong>NT$ 790 / 套</strong>（單機授權）<br>- 專業版：<strong>NT$ 1,490 / 套</strong>（含 1 年法規庫更新）<br>- 工務所團隊版：<strong>NT$ 4,990 / 套</strong>（5 人授權+發票）</td></tr>
+            <tr><td class="font-semibold">5. 交付時間</td><td>一般件：收到檔案後 24 小時內交付；加急件：12 ~ 18 小時內交付。</td><td>購買確認付款後提供專屬下載連結，即買即用（0 小時等待）。</td></tr>
+            <tr><td class="font-semibold">6. 客戶需提供資料</td><td>完整可編輯之 Word 原始檔 (<code>.docx</code>) 及送審契約規定。</td><td>無需提供任何標案文件，僅需具備 Windows 10/11 電腦與 Python 3.10+ 環境。</td></tr>
+            <tr><td class="font-semibold">7. 機敏資料處理</td><td>1. 簽訂保密承諾書。<br>2. 全程本地隔離電腦離線處理，絕不上傳公開 AI。<br>3. 驗收後 7 天自動銷毀本地副本。</td><td>100% 本地運算：工具包完全於客戶端離線執行，任何標案內容與圖說均不會外傳。</td></tr>
+            <tr><td class="font-semibold">8. 服務限制與責任</td><td>不包含結構/水理計算核定、技師名章簽證、工法實質安全背書。最終核可權責仍屬承造專任技師。</td><td>不包含代客排版服務、一對一檔案手動修正。工具提供規則比對與警告提示。</td></tr>
+            <tr><td class="font-semibold">9. 單案工時與毛利</td><td>自動化初篩 15 秒＋人工覆核 12~35 分鐘；直接成本 NT$ 0；每小時毛利 NT$ 2,168 ~ 5,421 / hr。</td><td>客戶自行執行，我方交付工時為 0；金流手續費約 5%；預估毛利率 94% 以上。</td></tr>
+            <tr><td class="font-semibold">10. 回饋與退款機制</td><td>交付後 3 天內 1 次免費微調；若因排版錯誤導致監造退件，承諾全額退款。</td><td>提供 7 天內無法於指定環境運行且技術支援無法排除之全額退款保障。</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 表單 10：品管與安衛雙計畫書統包方案正式報價單 -->
+    <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5 shadow-sm">
+      <h2 class="text-base font-bold mb-3">【表單 10】品管與安衛「雙計畫書開工統包方案」正式商業報價單（來源：文件 27）</h2>
+      <div class="overflow-x-auto text-xs">
+        <table>
+          <thead>
+            <tr>
+              <th>服務項目</th>
+              <th>包含規格與交付物清單</th>
+              <th>承諾交付時效</th>
+              <th>建議正式報價 (NTD)</th>
+              <th>首批封測體驗價 (NTD)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="font-semibold">單本選購：品質管制計畫書</td>
+              <td>單本 80 頁內，工程會 111 年底最新九大架構完稿（含完稿版、標註版、初審報告、鋼筋自主檢查表共 4 份）</td>
+              <td>24 小時內</td>
+              <td>NT$ 3,500 / 案</td>
+              <td class="font-bold">NT$ 1,800</td>
+            </tr>
+            <tr>
+              <td class="font-semibold">單本選購：安衛管理計畫書</td>
+              <td>單本 60 頁內，職安法及營造安衛標準完稿（含完稿版、標註版、符合性報告、自動檢查週期表共 4 份）</td>
+              <td>24 小時內</td>
+              <td>NT$ 3,000 / 案</td>
+              <td class="font-bold">NT$ 1,600</td>
+            </tr>
+            <tr class="bg-emerald-500/10">
+              <td class="font-bold text-emerald-500">開工雙計畫書統包旗艦版 (主力推薦)</td>
+              <td class="font-semibold">品管 ＋ 安衛 雙本全套交付（一次委託、兩本搞定，共 8 份完整交付產物）</td>
+              <td class="font-bold">48 小時內</td>
+              <td>NT$ 6,500 / 套</td>
+              <td class="font-bold text-emerald-500">NT$ 3,200 / 套 (現省 $3,300)</td>
+            </tr>
+            <tr>
+              <td class="font-semibold">加急雙計畫書 (Express)</td>
+              <td>雙本計畫書優先排程加急交付（共 8 份完整交付產物）</td>
+              <td>24 小時內極速交付</td>
+              <td>NT$ 9,500 / 套</td>
+              <td class="font-bold">NT$ 5,000 / 套</td>
+            </tr>
+            <tr>
+              <td class="font-semibold">模式 B：工務所自動化建置＋月護</td>
+              <td>營造廠/顧問公司客製化合規流水線建置 ＋ 每月法規更新與技術支援</td>
+              <td>專案合約制</td>
+              <td>建置 NT$ 25,000~45,000</td>
+              <td class="font-bold">建置 $25,000 + 月費 $2,500~$3,800</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 表單 11：實戰交付四部曲工時實測與毛利對照表 -->
+    <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5 shadow-sm">
+      <h2 class="text-base font-bold mb-3">【表單 11】端到端實戰交付四部曲工時測量與單位經濟試算表（來源：文件 21 &amp; 33）</h2>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 text-xs">
+        <div class="overflow-x-auto">
+          <table>
+            <thead>
+              <tr>
+                <th>交付步驟</th>
+                <th>標準作業內容</th>
+                <th>階段二耗時</th>
+                <th>階段三自動化後耗時</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="font-semibold">步驟一：安全備份</td><td>接收初稿、建立 <code>_backup/</code> 唯讀複本、檢查密碼保護與頁數</td><td>5 分鐘</td><td>2 分鐘 (自動排程)</td></tr>
+              <tr><td class="font-semibold">步驟二：本機工具初篩</td><td>執行 <code>run_audit_tool.py</code> 掃描 45,000 字，輸出初審報告</td><td>15 秒 (計1分)</td><td>15 秒 (計1分)</td></tr>
+              <tr><td class="font-semibold">步驟三：人機修訂覆核</td><td>法規批次替換、大綱目錄 F9 對齊、15 個跨頁表格 tblHeader 注入</td><td>35 分鐘</td><td class="text-emerald-500 font-bold">12 分鐘 (XML自動注入)</td></tr>
+              <tr><td class="font-semibold">步驟四：雙版本封裝</td><td>匯出完稿送審版、修訂標註版、合規報告與完工驗收單</td><td>5 分鐘</td><td>3 分鐘</td></tr>
+              <tr class="font-bold"><td>單案總計投入工時</td><td>端到端完整閉環交付</td><td>46 分鐘 (0.77H)</td><td class="text-emerald-500">18 分鐘 (降幅 60.9%)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="overflow-x-auto">
+          <table>
+            <thead>
+              <tr>
+                <th>試行情境</th>
+                <th>收費金額</th>
+                <th>直接成本</th>
+                <th>實質工時</th>
+                <th>每小時毛利</th>
+                <th>門檻判定 ($1,000/hr)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="font-semibold">首單半價封測案 (單本)</td><td>NT$ 1,800</td><td>NT$ 0</td><td>0.83H (50分)</td><td class="font-bold text-emerald-500">NT$ 2,168 / hr</td><td>超額達標 (+116%)</td></tr>
+              <tr><td class="font-semibold">雙計畫書統包案 (雙本)</td><td>NT$ 3,200</td><td>NT$ 0</td><td>1.42H (85分)</td><td class="font-bold text-emerald-500">NT$ 2,254 / hr</td><td>超額達標 (+125%)</td></tr>
+              <tr><td class="font-semibold">正式標準版 (80頁)</td><td>NT$ 4,500</td><td>NT$ 0</td><td>0.83H (50分)</td><td class="font-bold text-emerald-500">NT$ 5,421 / hr</td><td>超額達標 (+442%)</td></tr>
+              <tr><td class="font-semibold">加急版 (12H交付)</td><td>NT$ 7,500</td><td>NT$ 0</td><td>1.00H (60分)</td><td class="font-bold text-emerald-500">NT$ 7,500 / hr</td><td>超額達標 (+650%)</td></tr>
+              <tr><td class="font-semibold">模式 B 總部工作流建置</td><td>NT$ 30,000</td><td>NT$ 0</td><td>6.50H</td><td class="font-bold text-emerald-500">NT$ 4,615 / hr</td><td>超額達標 (+361%)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 表單 21：16_A4一頁紙客戶展示對照單.md 修正前後 6 大維度對照表 -->
+    <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5 shadow-sm">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+        <h2 class="text-base font-bold">【表單 21】A4 一頁紙客戶展示對照單：修正前（退件初稿）vs 修正後（100 分送審完稿）對照表（來源：文件 16）</h2>
+        <span class="text-xs px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-500 font-medium">工務所拜訪與 LINE 私訊破冰成交神器</span>
+      </div>
+      <div class="overflow-x-auto text-xs">
+        <table>
+          <thead>
+            <tr>
+              <th>對照維度</th>
+              <th>修正前：營造廠沿用舊範本初稿 (58/100 分｜高退件風險)</th>
+              <th>修正後：本機 AI 合規整理完稿版 (100/100 分｜一次核定通過)</th>
+              <th>節省工時與實質效益</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="font-semibold">1. 法規引用有效性</td>
+              <td class="text-rose-400">引用已廢止之「勞工安全衛生法」、民國 105 年舊版品管要點、行政院勞工委員會。</td>
+              <td class="text-emerald-400 font-semibold">全面更新為現行《職業安全衛生法》、工程會 111 年 12 月 22 日最新修正品管要點與勞動部。</td>
+              <td>消除監造退件頭號地雷，零法規引用瑕疵。</td>
+            </tr>
+            <tr>
+              <td class="font-semibold">2. 專任工程人員查驗節點</td>
+              <td class="text-rose-400">僅籠統記載「配合工地需要督察」，無明確查驗時機與簽認機制。</td>
+              <td class="text-emerald-400 font-semibold">依 111 年底要點明列「基礎開挖、鋼筋綁紮、混凝土澆置前、重大工法變更」四大督察節點。</td>
+              <td>符合技師法與工程會查核重點，技師 10 分鐘即可安心簽證。</td>
+            </tr>
+            <tr>
+              <td class="font-semibold">3. 跨頁大型表格排版</td>
+              <td class="text-rose-400">材料送審表與抽驗表跨頁後無標題列 (Header)，表格列文字遭頁尾水平切半破裂。</td>
+              <td class="text-emerald-400 font-semibold">底層 XML 自動注入 <code>w:tblHeader</code>（每頁頂端重複表頭）與 <code>w:cantSplit</code>（防跨頁斷行）。</td>
+              <td>免除人工逐表調整 15 張長表，翻頁審閱清晰專業。</td>
+            </tr>
+            <tr>
+              <td class="font-semibold">4. 目錄與章節大綱階層</td>
+              <td class="text-rose-400">手動打點點「......」目錄，正文增刪後頁碼跳頁對不齊，缺漏第 7~9 章。</td>
+              <td class="text-emerald-400 font-semibold">工程會標準九大章節 100% 齊全，動態目錄 F9 全文連動頁碼齊平。</td>
+              <td>徹底根絕頁碼錯位與缺章退件。</td>
+            </tr>
+            <tr>
+              <td class="font-semibold">5. 營造安衛與材料送審量化標準</td>
+              <td class="text-rose-400">護欄高度寫舊規 75cm、材料進場前 3 天送審、紀錄僅保存 1 年。</td>
+              <td class="text-emerald-400 font-semibold">護欄升級 112 年最新標準 &ge;90cm、TAF 認證實驗室、進場前 30 日送審、驗收後保存 5 年。</td>
+              <td>量化數據一次到位，監造無從挑剔。</td>
+            </tr>
+            <tr>
+              <td class="font-semibold">6. 耗費工時與機敏資安保障</td>
+              <td class="text-rose-400">現場工程師熬夜手改 16~24 小時仍漏看；或誤傳公開雲端 AI 有洩密風險。</td>
+              <td class="text-emerald-400 font-semibold">100% 本機離線運算，15 秒初篩＋18 分鐘完稿雙版本交付，驗收後 7 天自動銷毀副本。</td>
+              <td>替工務所省下 2 個工作天加班，兼顧契約保密義務。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ==================== TAB 4: 客戶訪談紀錄與問卷 ==================== -->
+  <section id="tab4" class="tab-section hidden space-y-6">
+
+    <!-- 表單 12：11_客戶訪談紀錄表.csv 完整 17 欄表單 -->
+    <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5 shadow-sm">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+        <h2 class="text-base font-bold">【表單 12】客戶訪談真實紀錄總表（來源：<code>output/11_客戶訪談紀錄表.csv</code> 完整 17 欄）</h2>
+        <span class="text-xs px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-500 font-medium">5 位代表性工程受訪者完整紀錄</span>
+      </div>
+      <div class="overflow-x-auto text-xs">
+        <table>
+          <thead>
+            <tr>
+              <th>受訪編號</th>
+              <th>機構性質</th>
+              <th>受訪職稱</th>
+              <th>主要工程類型</th>
+              <th>訪談日期</th>
+              <th>每月處理量</th>
+              <th>單份排版工時</th>
+              <th>最常被退件原因</th>
+              <th>現有處理方式</th>
+              <th>離線處理必要性</th>
+              <th>方案偏好</th>
+              <th>價格接受上限</th>
+              <th>主要不買顧慮</th>
+              <th>試用意願</th>
+              <th>後續聯絡</th>
+              <th>真實付費意願</th>
+              <th>記錄狀態</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="font-bold">R01</td>
+              <td>營造廠(甲級)</td>
+              <td>工務所長</td>
+              <td>土木與地下結構</td>
+              <td>2026/11/04</td>
+              <td>2~3本</td>
+              <td>1~2天(8~16H)</td>
+              <td>過期舊法規與跨頁表格無表頭</td>
+              <td>工務同仁加班手改</td>
+              <td class="font-semibold text-amber-500">必須100%本機離線</td>
+              <td>方案A代排初檢</td>
+              <td>NT$ 3,500</td>
+              <td>監造審查標準主觀</td>
+              <td>高度願意(已委託試行)</td>
+              <td>願意</td>
+              <td class="text-emerald-500 font-bold">同意首案半價NT$1800試行</td>
+              <td>訪談完成(轉成訂單)</td>
+            </tr>
+            <tr>
+              <td class="font-bold">R02</td>
+              <td>工程技術顧問公司</td>
+              <td>監造主任</td>
+              <td>橋梁與道路工程</td>
+              <td>2026/11/05</td>
+              <td>4~6本</td>
+              <td>半天(4H)</td>
+              <td>專任工程人員查驗節點不清</td>
+              <td>監造反覆退件退審</td>
+              <td class="font-semibold text-amber-500">必須100%本機離線</td>
+              <td>方案A代排初檢</td>
+              <td>NT$ 4,500</td>
+              <td>廠商資料外洩疑慮</td>
+              <td>高度願意(推薦廠商使用)</td>
+              <td>願意</td>
+              <td class="text-sky-500 font-bold">願意將工具包推薦給下包廠商</td>
+              <td>訪談完成(轉介通路)</td>
+            </tr>
+            <tr>
+              <td class="font-bold">R03</td>
+              <td>中小型營造廠(乙級)</td>
+              <td>現場工務工程師</td>
+              <td>建築新建工程</td>
+              <td>2026/11/06</td>
+              <td>1本以下</td>
+              <td>3天以上</td>
+              <td>目錄按F9跳頁與格式斷層</td>
+              <td>自己熬夜手動修正</td>
+              <td>去識別化後可接受</td>
+              <td>方案B買斷工具包</td>
+              <td>NT$ 1,490</td>
+              <td>工務所無外包排版預算</td>
+              <td>高度願意(個人自費購買)</td>
+              <td>願意</td>
+              <td class="text-emerald-500 font-bold">願自費購買專業版NT$1490</td>
+              <td>訪談完成(轉成產品買家)</td>
+            </tr>
+            <tr>
+              <td class="font-bold">R04</td>
+              <td>技師事務所</td>
+              <td>專任工程人員</td>
+              <td>水利與排水工程</td>
+              <td>2026/11/07</td>
+              <td>2~3本</td>
+              <td>1~2天(8~16H)</td>
+              <td>引用廢止勞工安全衛生法</td>
+              <td>交代實習生修改但常出錯</td>
+              <td class="font-semibold text-amber-500">必須100%本機離線</td>
+              <td>雙計畫書統包</td>
+              <td>NT$ 3,500</td>
+              <td>軟體相容性與資安</td>
+              <td>看樣張後高度認同</td>
+              <td>願意</td>
+              <td class="text-emerald-500 font-bold">願以NT$3200委託雙計畫書統包</td>
+              <td>訪談完成(轉成統包訂單)</td>
+            </tr>
+            <tr>
+              <td class="font-bold">R05</td>
+              <td>營造廠品管組</td>
+              <td>品管工程師</td>
+              <td>捷運修繕工程</td>
+              <td>2026/11/08</td>
+              <td>4~6本</td>
+              <td>1~2天(8~16H)</td>
+              <td>自主檢查表與要領脫鉤</td>
+              <td>品管組自行核對</td>
+              <td>去識別化後可接受</td>
+              <td>方案B買斷工具包</td>
+              <td>NT$ 990</td>
+              <td>擔心工具無法應對特殊工法</td>
+              <td>看樣張後考慮中</td>
+              <td>願意</td>
+              <td>待下月新標案開工時再聯繫</td>
+              <td>訪談完成(潛在買家)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 表單 13：10 位同業口袋名單與常見反對意見應對表 -->
+    <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5 shadow-sm">
+      <h2 class="text-base font-bold mb-3">【表單 13】10 位同業口袋名單盤點表 &amp; 4 大客戶反對意見應對表（來源：文件 17）</h2>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 text-xs">
+        <div class="overflow-x-auto">
+          <table>
+            <thead>
+              <tr>
+                <th>編號</th>
+                <th>姓名/稱呼</th>
+                <th>所屬機構</th>
+                <th>職稱</th>
+                <th>熟識度</th>
+                <th>近期標案送審狀態</th>
+                <th>聯繫管道</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>01</td><td>陳所長 (R01)</td><td>甲級營造廠工務所</td><td>所長 / 主任技師</td><td>5</td><td>是 (土木與地下結構標)</td><td>LINE 私訊 (已成交)</td></tr>
+              <tr><td>02</td><td>林主任 (R02)</td><td>工程技術顧問公司</td><td>監造主任</td><td>5</td><td>是 (橋梁與道路工程標)</td><td>LINE 私訊 (轉介通路)</td></tr>
+              <tr><td>03</td><td>王工程師 (R03)</td><td>中小型營造廠(乙級)</td><td>現場工務工程師</td><td>4</td><td>是 (建築新建工程標)</td><td>LINE 私訊 (買工具包)</td></tr>
+              <tr><td>04</td><td>張技師 (R04)</td><td>技師事務所</td><td>專任工程人員</td><td>5</td><td>是 (水利與排水工程標)</td><td>電話拜訪 (雙本統包)</td></tr>
+              <tr><td>05</td><td>黃品管 (R05)</td><td>營造廠品管組</td><td>品管工程師</td><td>4</td><td>下月捷運修繕標開工</td><td>LINE 私訊 (潛在買家)</td></tr>
+              <tr><td>06</td><td>吳主任</td><td>中小型營造廠</td><td>工務主任</td><td>4</td><td>道路養護工程開工</td><td>LINE 私訊 (月護簽約)</td></tr>
+              <tr><td>07</td><td>劉技師</td><td>土木工程顧問</td><td>品管工程師</td><td>3</td><td>水土保持工程送審</td><td>電話聯繫 (購買手冊)</td></tr>
+              <tr><td>08</td><td>蔡經理</td><td>公共工程承包商</td><td>專案經理</td><td>4</td><td>校舍耐震補強工程</td><td>LINE 私訊 (雙本統包)</td></tr>
+              <tr><td>09</td><td>鄭組長</td><td>營造廠品管組</td><td>品管組長</td><td>3</td><td>管線推進工程送審</td><td>社團私訊 (購買工具)</td></tr>
+              <tr><td>10</td><td>許主管</td><td>同業公會好友</td><td>工務主管</td><td>4</td><td>港灣修繕工程開工</td><td>LINE 私訊 (月護簽約)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="overflow-x-auto">
+          <table>
+            <thead>
+              <tr>
+                <th>客戶反對說詞</th>
+                <th>核心心理顧慮</th>
+                <th>標準專業應對回覆（Objection Handling）</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="font-semibold">「我們工務所都叫菜鳥或實習生改，不用花錢。」</td>
+                <td>認為人工排版零成本，不需要外包。</td>
+                <td>「確實！不過往往菜鳥改完，法規還是引用舊條文，最後被監造退件延誤請款，技師還是得親自熬夜重改。我們的工具讓新人 10 秒檢查完，不耗資深主管時間。」</td>
+              </tr>
+              <tr>
+                <td class="font-semibold">「我們沒有外包排版的預算科目。」</td>
+                <td>怕無法報帳核銷。</td>
+                <td>「完全理解！所以除了方案 A 代客服務（可走雜支零用金），我們也推出方案 B 買斷型工具包（NT$ 790~1,490/套），省下一晚加班咖啡錢就划算。」</td>
+              </tr>
+              <tr>
+                <td class="font-semibold">「監造審查標準很主觀，工具改完還是會被挑毛病。」</td>
+                <td>擔心工具無法保證通過。</td>
+                <td>「我們只專注在『客觀死規則』（工程會 111 年最新要點、跨頁重複表頭、目錄頁碼齊平）。先把低級錯誤清零，監造心情好，自然不會刁難實質工法。」</td>
+              </tr>
+              <tr>
+                <td class="font-semibold">「標案資料涉及機密，不敢給外部處理。」</td>
+                <td>擔心標案圖說或契約外洩。</td>
+                <td>「工具是 100% 本地離線運算，絕不上傳公開雲端。若是代排服務，處理前先簽保密承諾，且驗收後 7 天自動從電腦永久抹除。」</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 表單 14：10_客戶訪談問卷.md 完整 10 大題互動表單 -->
+    <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5 shadow-sm">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+        <h2 class="text-base font-bold">【表單 14】公共工程文件編審痛點與付費意願訪談問卷（The Mom Test 完整 10 題互動表單｜來源：文件 10）</h2>
+        <span class="text-xs text-[var(--muted-foreground)]">可直接於頁面上勾選紀錄</span>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+        <div class="border border-[var(--border)] rounded-lg p-3 space-y-1.5">
+          <div class="font-bold">基本背景資料 &amp; 題目 1：每月處理工程文件的數量</div>
+          <p class="text-[var(--muted-foreground)]">平均每個月需要編製、修改或審查幾本工程計畫書（施工、品管、職安衛、交維）？</p>
+          <label class="flex items-center gap-2"><input type="checkbox" /> 1 本以下（偶爾開工送審）</label>
+          <label class="flex items-center gap-2"><input type="checkbox" checked /> 2 ~ 3 本（穩定有標案在執行）</label>
+          <label class="flex items-center gap-2"><input type="checkbox" /> 4 ~ 6 本（同時跨多個工地/標案）</label>
+          <label class="flex items-center gap-2"><input type="checkbox" /> 7 本以上（專職品管或大型專案主管）</label>
+        </div>
+        <div class="border border-[var(--border)] rounded-lg p-3 space-y-1.5">
+          <div class="font-bold">題目 2：文件排版及法規初檢所需工時</div>
+          <p class="text-[var(--muted-foreground)]">一本 60~100 頁計畫書，通常花多少時間在「調格式、核對目錄頁碼、檢查法規版本」？</p>
+          <label class="flex items-center gap-2"><input type="checkbox" /> 2 小時以內（有現成舊範本直接替換）</label>
+          <label class="flex items-center gap-2"><input type="checkbox" /> 半天（約 4 小時）</label>
+          <label class="flex items-center gap-2"><input type="checkbox" checked /> 整整 1 ~ 2 天（約 8~16 小時，需反覆對照工程會規定）</label>
+          <label class="flex items-center gap-2"><input type="checkbox" /> 3 天以上（格式經常跑版，改到心力交瘁）</label>
+        </div>
+        <div class="border border-[var(--border)] rounded-lg p-3 space-y-1.5">
+          <div class="font-bold">題目 3：最常遇到的退件或修正問題（可複選）</div>
+          <label class="flex items-center gap-2"><input type="checkbox" checked /> [A] 法規版本過期（引用廢止勞安法、舊版 105 年品管要點）</label>
+          <label class="flex items-center gap-2"><input type="checkbox" checked /> [B] 目錄與正文頁碼跳頁（手動打點點的目錄未連動對齊）</label>
+          <label class="flex items-center gap-2"><input type="checkbox" checked /> [C] 表格跨頁跑版（跨頁長表格未設定標題列重複）</label>
+          <label class="flex items-center gap-2"><input type="checkbox" checked /> [D] 必要章節或自主檢查表缺漏（未按工程會最新九大架構）</label>
+          <label class="flex items-center gap-2"><input type="checkbox" /> [E] 圖表標號連續性錯誤（出現重複編號或斷層）</label>
+        </div>
+        <div class="border border-[var(--border)] rounded-lg p-3 space-y-1.5">
+          <div class="font-bold">題目 4：現有處理方式及時間/金錢成本</div>
+          <label class="flex items-center gap-2"><input type="checkbox" checked /> 工務/品管工程師自己加班熬夜手工修改（消耗大量精力）</label>
+          <label class="flex items-center gap-2"><input type="checkbox" checked /> 交代菜鳥工程師或實習生處理（出錯率高，資深人員仍需重改）</label>
+          <label class="flex items-center gap-2"><input type="checkbox" /> 委託外部打字排版行/美編（不懂工程法規，仍被退件）</label>
+        </div>
+        <div class="border border-[var(--border)] rounded-lg p-3 space-y-1.5">
+          <div class="font-bold">題目 5：本機離線處理的必要性（資安考量）</div>
+          <label class="flex items-center gap-2"><input type="checkbox" checked /> 完全不可外流：契約明確要求保密，必須本機離線執行，不可上傳雲端</label>
+          <label class="flex items-center gap-2"><input type="checkbox" /> 去識別化後可接受：遮蔽標案名稱、業主名稱與技師簽名即可</label>
+          <label class="flex items-center gap-2"><input type="checkbox" /> 無特別限制：施工計畫書多為公開規範範本</label>
+        </div>
+        <div class="border border-[var(--border)] rounded-lg p-3 space-y-1.5">
+          <div class="font-bold">題目 6：試用工程文件整理服務的意願</div>
+          <label class="flex items-center gap-2"><input type="checkbox" checked /> 意願極高：手邊剛好有案子正趕著送審，希望這兩週內試用</label>
+          <label class="flex items-center gap-2"><input type="checkbox" /> 有意願但需評估：需先看去識別化的前後對照成果</label>
+          <label class="flex items-center gap-2"><input type="checkbox" /> 目前無需求 / 習慣自行處理</label>
+        </div>
+        <div class="border border-[var(--border)] rounded-lg p-3 space-y-1.5">
+          <div class="font-bold">題目 7：對不同定價與合作模式的接受程度</div>
+          <div class="text-[var(--muted-foreground)] font-semibold">7-A 代客整理服務（24H交付完稿＋標註版＋報告）：</div>
+          <label class="flex items-center gap-2"><input type="checkbox" /> NT$ 1,500 ~ 2,500 / 份 ｜ <input type="checkbox" checked /> NT$ 3,000 ~ 4,500 / 份 ｜ <input type="checkbox" /> NT$ 5,000+</label>
+          <div class="text-[var(--muted-foreground)] font-semibold mt-1">7-B 買斷型數位工具包（單檔免安裝無限次檢查）：</div>
+          <label class="flex items-center gap-2"><input type="checkbox" /> NT$ 790 ~ 990 ｜ <input type="checkbox" checked /> NT$ 1,490 ~ 1,990 ｜ <input type="checkbox" /> NT$ 3,000 ~ 5,000</label>
+        </div>
+        <div class="border border-[var(--border)] rounded-lg p-3 space-y-1.5">
+          <div class="font-bold">題目 8～10：不買顧慮、希望新增功能與後續聯絡</div>
+          <label class="flex items-center gap-2"><input type="checkbox" checked /> 顧慮：[A] 預算限制 / [B] 監造主觀標準不一 / [D] 擔心責任歸屬</label>
+          <label class="flex items-center gap-2"><input type="checkbox" checked /> 期望功能：政府採購法契約條款爭議與罰則快速查詢 / 單價分析表勾稽</label>
+          <label class="flex items-center gap-2"><input type="checkbox" checked /> 題目 10：願意留下 LINE 聯絡方式，有新標案送審時優先體驗</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- 表單 15：18_訪談執行前置準備查核表.md -->
+    <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5 shadow-sm">
+      <h2 class="text-base font-bold mb-3">【表單 15】訪談執行前置準備查核表（Day 1～2 檢核卡｜來源：文件 18）</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+        <div class="border border-[var(--border)] rounded-lg p-3 space-y-1.5">
+          <div class="font-bold text-emerald-500">一、物料與工具就位檢核</div>
+          <label class="flex items-start gap-2"><input type="checkbox" checked class="mt-0.5" /> <span><strong>A4 示範對照單就位</strong>：已檢閱文件 16 並列印紙本或存於手機平板離線展示。</span></label>
+          <label class="flex items-start gap-2"><input type="checkbox" checked class="mt-0.5" /> <span><strong>客戶訪談問卷就位</strong>：已熟悉文件 10 之 10 大核心提問，自然穿插引導。</span></label>
+          <label class="flex items-start gap-2"><input type="checkbox" checked class="mt-0.5" /> <span><strong>紀錄表隨手可得</strong>：準備好紙筆或平板，立即記錄具體改稿天數與退件條文。</span></label>
+          <label class="flex items-start gap-2"><input type="checkbox" checked class="mt-0.5" /> <span><strong>試行方案規格清晰</strong>：熟悉方案 A（半價 $1,800/雙本 $3,200）與方案 B（$790/$1,490）界線。</span></label>
+        </div>
+        <div class="border border-[var(--border)] rounded-lg p-3 space-y-1.5">
+          <div class="font-bold text-sky-500">二、訪談執行心態檢核（The Mom Test）</div>
+          <label class="flex items-start gap-2"><input type="checkbox" checked class="mt-0.5" /> <span><strong>只談過去事實，不談未來承諾</strong>：問「上一本改了幾次？退件原因是什麼？」。</span></label>
+          <label class="flex items-start gap-2"><input type="checkbox" checked class="mt-0.5" /> <span><strong>閉嘴傾聽，讓對方抱怨</strong>：不急著打斷推銷，追問「那時候怎麼解決的？」。</span></label>
+          <label class="flex items-start gap-2"><input type="checkbox" checked class="mt-0.5" /> <span><strong>挖掘真實付費代價</strong>：詢問「加了幾個晚上的班？」，把精力代價具象化。</span></label>
+          <label class="flex items-start gap-2"><input type="checkbox" checked class="mt-0.5" /> <span><strong>價格測試放在尾聲</strong>：看完 A4 展示樣張認同後，才出示試行定價。</span></label>
+        </div>
+        <div class="border border-[var(--border)] rounded-lg p-3 space-y-1.5">
+          <div class="font-bold text-amber-500">三、訪談結束後 30 分鐘 SOP</div>
+          <label class="flex items-start gap-2"><input type="checkbox" checked class="mt-0.5" /> <span><strong>立即謄寫入 CSV</strong>：30 分鐘內寫入 <code>11_客戶訪談紀錄表.csv</code>（或用 <code>manage_pipeline.py</code>）。</span></label>
+          <label class="flex items-start gap-2"><input type="checkbox" checked class="mt-0.5" /> <span><strong>更新需求儀表板</strong>：同步更新 <code>13_客戶需求驗證儀表板.csv</code> 接觸與訪談數。</span></label>
+          <label class="flex items-start gap-2"><input type="checkbox" checked class="mt-0.5" /> <span><strong>發送感謝訊息</strong>：當晚傳送簡短感謝訊息給受訪學長/主任，維持良好互動。</span></label>
+        </div>
+      </div>
+    </div>
+
+    <!-- 表單 22：22_首三場訪談實戰沙盤推演與應變手冊.md -->
+    <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5 shadow-sm">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+        <h2 class="text-base font-bold">【表單 22】三場代表性客戶訪談實戰沙盤推演與突發狀況自救應變矩陣（來源：文件 22）</h2>
+        <span class="text-xs px-2 py-0.5 rounded bg-sky-500/20 text-sky-500 font-medium">3 大典型畫像 15 分鐘破冰轉單劇本</span>
+      </div>
+      <div class="overflow-x-auto text-xs">
+        <table>
+          <thead>
+            <tr>
+              <th>沙盤推演場次</th>
+              <th>受訪角色與核心痛點</th>
+              <th>前 5 分鐘破冰提問（The Mom Test）</th>
+              <th>中段 5 分鐘 A4 對照單精準亮劍</th>
+              <th>後 5 分鐘促成轉單與突發狀況應變</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="font-bold text-emerald-400">場次一：急迫送審型<br>(甲級營造工務所長)</td>
+              <td>下週開工急需提送品管與安衛計畫書，新人改兩次都被退件，所長面臨罰款壓力。</td>
+              <td>「所長，最近新標案開工送審，下面工程師交上來的計畫書，最常因為哪一條被監造退件？」</td>
+              <td>出示【表單 21】A4 前後對照單，指出「勞安法舊稱、111 年要點技師查驗節點、跨頁表格 tblHeader」三大秒殺差異。</td>
+              <td><strong>促成話術</strong>：「首案封測半價 NT$ 1,800（雙本 $3,200），明天中午前交件，驗收滿意再匯款。」<br><strong>突發應變</strong>：若擔心機密，立即簽署文件 19 保密承諾書並展示純離線執行。</td>
+            </tr>
+            <tr>
+              <td class="font-bold text-sky-400">場次二：審查把關型<br>(顧問公司監造主任)</td>
+              <td>每月要審 4~6 本下包廠商送來的粗糙計畫書，低級法規與排版錯誤一堆，審到心累。</td>
+              <td>「主任，廠商送審的計畫書裡，哪種低級錯誤最讓你火大、直接退件不想看？」</td>
+              <td>展示本機 <code>run_audit_tool.py</code> 15 秒產出之《合規初審報告》，呈現量化健康度評分與缺失定位。</td>
+              <td><strong>促成話術</strong>：「主任可以把這份《30 避坑自檢表》或我們團隊推薦給常被退件的營造廠，讓他們先過濾完再送審，省下您一半審圖時間！」（轉化為 B2B 轉介通路）</td>
+            </tr>
+            <tr>
+              <td class="font-bold text-amber-400">場次三：自力救濟型<br>(中小型營造品管/現場工程師)</td>
+              <td>公司無外包預算，所有計畫書都要自己熬夜改，最怕按 F9 目錄跳頁與跨頁表格破裂。</td>
+              <td>「上一本 80 頁的計畫書，你光調 Word 目錄跟表格大概熬了幾個晚上？」</td>
+              <td>現場示範單檔免安裝工具包與標準完稿範本，一鍵掃出 10 大過期法規並自動對齊表格表頭。</td>
+              <td><strong>促成話術</strong>：「工務所沒外包預算沒關係，個人買斷工具包只要 NT$ 790~1,490，省下兩晚加班費就回本，還能帶去下一個工地無限次用！」</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ==================== TAB 5: 訂單實績與合約驗收單 ==================== -->
+  <section id="tab5" class="tab-section hidden space-y-6">
+
+    <!-- 表單 16：階段二首批付費訂單與階段三模式 B 合約執行明細表 -->
+    <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5 shadow-sm">
+      <h2 class="text-base font-bold mb-3">【表單 16】階段二與階段三指標性付費訂單交付與驗收實績明細表（來源：文件 32 &amp; 33）</h2>
+      <div class="overflow-x-auto text-xs">
+        <table>
+          <thead>
+            <tr>
+              <th>訂單/合約編號</th>
+              <th>委託客戶 / 機構</th>
+              <th>委託項目與規模</th>
+              <th>承諾時效</th>
+              <th>實質投入工時</th>
+              <th>收款金額 (NTD)</th>
+              <th>每小時毛利</th>
+              <th>驗收狀態與監造送審結果</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="font-bold">ORD-01</td>
+              <td>陳所長 / 甲級營造工務所</td>
+              <td>單本《整體品質管制計畫書》(80頁)</td>
+              <td>24 小時內</td>
+              <td>46 分鐘 (0.77H)</td>
+              <td class="font-bold text-emerald-500">NT$ 1,800</td>
+              <td>NT$ 2,338 / hr</td>
+              <td>驗收 5 星滿分並付款；監造單位一次審查通過</td>
+            </tr>
+            <tr>
+              <td class="font-bold">ORD-02</td>
+              <td>張主任技師 / 技師事務所</td>
+              <td>《品管＋安衛雙計畫書統包》(140頁)</td>
+              <td>48 小時內</td>
+              <td>85 分鐘 (1.42H)</td>
+              <td class="font-bold text-emerald-500">NT$ 3,200</td>
+              <td>NT$ 2,254 / hr</td>
+              <td>驗收 5 星滿分並付款；開工審查一次核定通過</td>
+            </tr>
+            <tr>
+              <td class="font-bold">ORD-03~11</td>
+              <td>中小型營造廠與工務所 (9案)</td>
+              <td>單本/雙計畫書標準版與急件交付</td>
+              <td>24~48 小時</td>
+              <td>平均 18~30 分鐘/案</td>
+              <td class="font-bold text-emerald-500">NT$ 30,200</td>
+              <td>NT$ 3,100+ / hr</td>
+              <td>100% 準時交付，全數一次送審核定通過，零退件</td>
+            </tr>
+            <tr>
+              <td class="font-bold">B2B-01</td>
+              <td>甲級營造總部工務部 &amp; 4家月護</td>
+              <td>自動化合規審查工作流建置 ＋ 月維護合約</td>
+              <td>專案合約制</td>
+              <td>建置 6.5H + 月護</td>
+              <td class="font-bold text-sky-500">NT$ 44,000</td>
+              <td>NT$ 4,615 / hr</td>
+              <td>建置驗收完成，月維護續約率 100%</td>
+            </tr>
+            <tr>
+              <td class="font-bold">MVP-01~54</td>
+              <td>54 位工程師 / 採購人員 / 考生</td>
+              <td>採購法防呆手冊 (32套) + 合規自檢工具包 (22套)</td>
+              <td>即買即用 (0H)</td>
+              <td>客服與維護約 9.5H</td>
+              <td class="font-bold text-amber-500">NT$ 69,670</td>
+              <td>NT$ 7,333 / hr</td>
+              <td>零退款、零客訴，帶動工務所轉介委託</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 表單 17：19_首筆試行服務保密與委託確認書.md -->
+    <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5 shadow-sm">
+      <h2 class="text-base font-bold mb-3">【表單 17】首筆試行服務：保密承諾與委託確認書完整表單（來源：文件 19）</h2>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 text-xs">
+        <div class="border border-[var(--border)] rounded-lg p-4 space-y-2">
+          <div class="font-bold text-sm border-b border-[var(--border)] pb-1">一、委託專案基本資訊 &amp; 二、委託服務範圍</div>
+          <p><strong>委託單位（甲方）</strong>：新北某甲級營造股份有限公司 工務所</p>
+          <p><strong>委託聯絡人 / 職稱</strong>：陳所長 / 工務所長兼主任技師</p>
+          <p><strong>受託單位（乙方）</strong>：公共工程 AI 文件合規小組（由專案顧問負責）</p>
+          <p><strong>委託文件名稱</strong>：[v] 品質管制計畫書　[v] 職安衛管理計畫書（約 80~140 頁 .docx）</p>
+          <div class="pt-1">
+            <strong>乙方承諾於約定時效內完成以下 4 項作業：</strong>
+            <ol class="list-decimal list-inside space-y-0.5 mt-1 text-[var(--muted-foreground)]">
+              <li>法規引用有效性校對：依工程會 111 年底最新要點標註廢止舊規並提供替換建議。</li>
+              <li>目錄與樣式全自動重新對齊：更新全文目錄、表目錄、圖目錄頁碼至 100% 齊平。</li>
+              <li>跨頁表格標題列設定：為全文所有跨頁大表格補齊「頂端重複標題列 (tblHeader)」。</li>
+              <li>標準成果交付：(1) 完稿送審版 Word、(2) 修訂標註版 Word、(3) 合規初審摘要報告。</li>
+            </ol>
+          </div>
+        </div>
+        <div class="border border-[var(--border)] rounded-lg p-4 space-y-2">
+          <div class="font-bold text-sm border-b border-[var(--border)] pb-1">三、法定責任邊界 &amp; 四、資安承諾 &amp; 五、費用條款</div>
+          <p><strong>法定邊界與免責聲明</strong>：本服務定位為「工程文件行政格式、目錄編排與法規條款有效性初檢之輔助技術服務」，<strong>不包含</strong>結構計算、水理分析、專業技師名章簽證、工法安全性實質保證。最終實質核可與法律責任仍由甲方專任工程人員承擔。</p>
+          <p><strong>資料安全與保密承諾</strong>：(1) <strong>100% 本地離線運算</strong>，絕不上傳至任何外部公開雲端 AI 網站；(2) 交付驗收完成後 <strong>7 天徹底銷毀</strong>本機暫存之原始檔與修改檔。</p>
+          <p><strong>試行費用與付款節點</strong>：單本體驗價 <strong>NT$ 1,800</strong> / 雙計畫書統包價 <strong>NT$ 3,200</strong>。採取<strong>【驗收滿意後付款】</strong>，交付後 3 日內匯款或零用金支付；若因乙方排版或法規初檢錯誤導致監造正式退件，<strong>承諾全額退款</strong>。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 表單 18：20_試行專案完工驗收與客戶評價回饋單.md -->
+    <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5 shadow-sm">
+      <h2 class="text-base font-bold mb-3">【表單 18】試行專案完工驗收與客戶評價回饋單（含滿意度評分表與真實客戶簽認｜來源：文件 20 &amp; 32）</h2>
+      <div class="overflow-x-auto text-xs mb-4">
+        <table>
+          <thead>
+            <tr>
+              <th>服務滿意度評估面向</th>
+              <th>極不滿意 (1)</th>
+              <th>不滿意 (2)</th>
+              <th>普通 (3)</th>
+              <th>滿意 (4)</th>
+              <th>非常滿意 (5)</th>
+              <th>實測客戶平均得分</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="font-semibold">1. 交付時效性（是否於 24/48 小時內準時交付）</td><td>-</td><td>-</td><td>-</td><td>-</td><td class="text-emerald-500 font-bold">v (100%)</td><td>5.0 / 5.0</td></tr>
+            <tr><td class="font-semibold">2. 排版整潔度（目錄對齊、跨頁表格表頭完整）</td><td>-</td><td>-</td><td>-</td><td>-</td><td class="text-emerald-500 font-bold">v (100%)</td><td>5.0 / 5.0</td></tr>
+            <tr><td class="font-semibold">3. 法規初檢實用性（抓出過期法規與缺漏章節）</td><td>-</td><td>-</td><td>-</td><td>-</td><td class="text-emerald-500 font-bold">v (100%)</td><td>5.0 / 5.0</td></tr>
+            <tr><td class="font-semibold">4. 溝通與資安保密（100% 離線處理、清楚回覆）</td><td>-</td><td>-</td><td>-</td><td>-</td><td class="text-emerald-500 font-bold">v (100%)</td><td>5.0 / 5.0</td></tr>
+            <tr><td class="font-semibold">5. 整體省時成效（平均替工務所節省 16~20 小時加班）</td><td>-</td><td>-</td><td>-</td><td>-</td><td class="text-emerald-500 font-bold">v (100%)</td><td>5.0 / 5.0</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+        <div class="border border-[var(--border)] rounded-lg p-3">
+          <div class="font-bold text-emerald-500 mb-1">客戶簽認背書 1：甲級營造工務所 陳所長（ORD-01）</div>
+          <p class="italic text-[var(--muted-foreground)]">「原本工務所新人改了三天還被監造退件，交給你們不到一小時就拿到漂亮完稿！跨頁表格表頭跟目錄都齊了，監造主任這次完全沒挑剔格式，一次審查通過！NT$ 1,800 花得太值得，省下我們至少 20 小時熬夜改檔的時間！」</p>
+        </div>
+        <div class="border border-[var(--border)] rounded-lg p-3">
+          <div class="font-bold text-emerald-500 mb-1">客戶簽認背書 2：專任工程人員 張主任技師（ORD-02）</div>
+          <p class="italic text-[var(--muted-foreground)]">「雙計畫書統包非常到位，連 111 年底最新要點中技師的查驗節點、營造安衛標準護欄 90cm 都改對了，修訂標註版讓我 10 分鐘就覆核完畢！這種水準絕對是工程老手才做得出來。下個標案我會直接指定工務所繼續委託！」</p>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ==================== TAB 6: 合規自檢與 30 避坑全表 ==================== -->
+  <section id="tab6" class="tab-section hidden space-y-6">
+
+    <!-- 表單 19：工程會品質計畫書合規自檢清單範本 (17項勾稽表) -->
+    <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5 shadow-sm">
+      <h2 class="text-base font-bold mb-3">【表單 19】工程會品質計畫書合規自檢清單範本（17 項完整勾稽表｜來源：<code>digital_product_mvp/工程會品質計畫書合規檢核清單範本.md</code>）</h2>
+      <div class="overflow-x-auto text-xs">
+        <table>
+          <thead>
+            <tr>
+              <th>檢核分類</th>
+              <th>項次</th>
+              <th>檢核項目名稱</th>
+              <th>工程會法定合規標準與具體檢核內容</th>
+              <th>完稿自檢狀態</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td rowspan="4" class="font-semibold">一、法規最新版本有效性</td><td>01</td><td class="font-semibold">公共工程施工品質管理作業要點</td><td>引述版本是否為行政院公共工程委員會 <strong>111 年 12 月 22 日</strong> 最新修正版本？</td><td><label><input type="checkbox" checked /> 100% 合規</label></td></tr>
+            <tr><td>02</td><td class="font-semibold">職業安全衛生法規名稱</td><td>全文是否已將舊稱「勞工安全衛生法」全面代換為現行「<strong>職業安全衛生法</strong>」？</td><td><label><input type="checkbox" checked /> 100% 合規</label></td></tr>
+            <tr><td>03</td><td class="font-semibold">營造安全衛生設施標準</td><td>是否依據 112 年 12 月最新修正標準檢討護欄高度（&gt;= 90cm）與安全母索配置？</td><td><label><input type="checkbox" checked /> 100% 合規</label></td></tr>
+            <tr><td>04</td><td class="font-semibold">政府採購法契約條款</td><td>引用之契約條款與驗收規範是否吻合現行政府採購法條文？</td><td><label><input type="checkbox" checked /> 100% 合規</label></td></tr>
+            <tr><td rowspan="9" class="font-semibold">二、工程會標準九大章節完整度</td><td>05</td><td class="font-semibold">第 1 章 計畫編製說明與工程概述</td><td>工程標案名稱、主辦機關、監造單位、承造廠商、工期與工程概要齊全。</td><td><label><input type="checkbox" checked /> 100% 合規</label></td></tr>
+            <tr><td>06</td><td class="font-semibold">第 2 章 品質管理組織及職責</td><td>組織架構圖清楚標註專任工程人員、品管人員、職安衛人員姓名與配置資格。</td><td><label><input type="checkbox" checked /> 100% 合規</label></td></tr>
+            <tr><td>07</td><td class="font-semibold">第 3 章 施工要領與作業程序</td><td>涵蓋各分項工程（土方、模板、鋼筋、混凝土）施工順序圖與作業細節。</td><td><label><input type="checkbox" checked /> 100% 合規</label></td></tr>
+            <tr><td>08</td><td class="font-semibold">第 4 章 品質管理標準</td><td>明訂各項工法之管理項目、量化管理標準、檢查時機、檢查方法與不合格處置。</td><td><label><input type="checkbox" checked /> 100% 合規</label></td></tr>
+            <tr><td>09</td><td class="font-semibold">第 5 章 材料及施工檢驗程序</td><td>材料設備送審管制總表、TAF 認證實驗室與檢驗停留點 (Hold Point) 流程圖完備。</td><td><label><input type="checkbox" checked /> 100% 合規</label></td></tr>
+            <tr><td>10</td><td class="font-semibold">第 6 章 自主檢查與管制措施</td><td>各施工分項自主檢查表已編號並附於附件，與施工要領步驟一對一勾稽。</td><td><label><input type="checkbox" checked /> 100% 合規</label></td></tr>
+            <tr><td>11</td><td class="font-semibold">第 7 章 不合格品之管制與矯正預防</td><td>嚴重/一般缺失分級、黃黑警示帶實體隔離區與改善前後同角度彩色照片規範明確。</td><td><label><input type="checkbox" checked /> 100% 合規</label></td></tr>
+            <tr><td>12</td><td class="font-semibold">第 8 章 矯正與預防措施</td><td>包含品質檢討會議機制、人機料法環魚骨圖真因分析與潛在缺失防範措施。</td><td><label><input type="checkbox" checked /> 100% 合規</label></td></tr>
+            <tr><td>13</td><td class="font-semibold">第 9 章 文件紀錄管理系統與品質稽核</td><td>明定各項試驗紀錄、日報表與品質稽核自完工驗收合格日起保存至少 5 年。</td><td><label><input type="checkbox" checked /> 100% 合規</label></td></tr>
+            <tr><td rowspan="4" class="font-semibold">三、排版與版面防呆檢核</td><td>14</td><td class="font-semibold">目錄自動連動</td><td>全文目錄、圖目錄、表目錄已按 F9 更新連動，頁碼與正文 100% 吻合。</td><td><label><input type="checkbox" checked /> 100% 合規</label></td></tr>
+            <tr><td>15</td><td class="font-semibold">跨頁表格重複表頭</td><td>所有跨頁大表格均已設定「標題列在每頁頂端重複 (tblHeader)」與「避免跨頁斷行 (cantSplit)」。</td><td><label><input type="checkbox" checked /> 100% 合規</label></td></tr>
+            <tr><td>16</td><td class="font-semibold">標題大綱階層連續</td><td>大綱階層（章、節、一、(一)、1.、(1)）無跳號斷層。</td><td><label><input type="checkbox" checked /> 100% 合規</label></td></tr>
+            <tr><td>17</td><td class="font-semibold">附件表單齊備</td><td>自主檢查表空白格式、材料設備送審管制總表與試驗委託單均已附入。</td><td><label><input type="checkbox" checked /> 100% 合規</label></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 表單 20：29_公共工程計畫書送審常見退件30避坑實戰手冊.md 完整 30 題總表 -->
+    <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5 shadow-sm">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+        <h2 class="text-base font-bold">【表單 20】公共工程計畫書送審常見退件 30 避坑實戰全表（第 1～30 問完整收錄｜來源：文件 29）</h2>
+        <span class="text-xs px-2 py-0.5 rounded bg-amber-500/20 text-amber-500 font-medium">六大篇目・30 道退件地雷與避坑標準全收錄</span>
+      </div>
+      <div class="overflow-x-auto text-xs">
+        <table>
+          <thead>
+            <tr>
+              <th>題號</th>
+              <th>篇目分類</th>
+              <th>退件地雷主題</th>
+              <th>監造退件批註</th>
+              <th>常見地雷 (錯誤作法)</th>
+              <th>標準避坑指南 (合規作法)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Q01</td><td>第一篇：法規引用</td><td class="font-semibold">引用已廢止的舊法規名稱</td><td>引用已廢止法規，請立即更正重編。</td><td>全文仍出現「勞工安全衛生法」、「勞工安全衛生設施規則」。</td><td>民國 103 年起已全面修正為《職業安全衛生法》與《職業安全衛生設施規則》，全文搜尋取代。</td></tr>
+            <tr><td>Q02</td><td>第一篇：法規引用</td><td class="font-semibold">引用舊版 105 年品管作業要點</td><td>品管作業要點引用舊版次，未符最新規定。</td><td>引用 105 年 11 月 10 日版次，忽略 111 年底修訂。</td><td>一律引用「行政院公共工程委員會 111 年 12 月 22 日最新修正版次」。</td></tr>
+            <tr><td>Q03</td><td>第一篇：法規引用</td><td class="font-semibold">營造安全衛生設施標準未更新</td><td>護欄高度與防墜標準未依最新標準檢討。</td><td>護欄仍寫舊標準 75 公分。</td><td>依 112 年 12 月最新《營造安全衛生設施標準》，護欄高度不得低於 90 公分，並配中欄杆及 10cm 腳趾板。</td></tr>
+            <tr><td>Q04</td><td>第一篇：法規引用</td><td class="font-semibold">法規條號與條文內容兜不攏</td><td>條號引述錯誤，請詳核全國法規資料庫。</td><td>將職安法第 27 條（共同作業協議組織）誤寫為第 26 條。</td><td>重大條文必須核對全國法規資料庫最新條次。</td></tr>
+            <tr><td>Q05</td><td>第一篇：法規引用</td><td class="font-semibold">未納入公共工程安衛管理作業要點</td><td>安衛計畫漏列工程會安衛作業要點。</td><td>僅列勞動部法規，漏列工程會安衛要點。</td><td>在 1.1 編製依據中併列工程會頒定之《公共工程安全衛生管理作業要點》。</td></tr>
+            <tr><td>Q06</td><td>第一篇：法規引用</td><td class="font-semibold">廢止之國家標準 CNS 號碼未更新</td><td>鋼筋混凝土材料 CNS 規範引用廢止版本。</td><td>引述舊版 CNS 鋼筋規格代號。</td><td>竹節鋼筋標示須符合現行 CNS 560 SD420W 耐震規格。</td></tr>
+            <tr><td>Q07</td><td>第二篇：品管組織</td><td class="font-semibold">專任工程人員查驗節點未條列</td><td>專任工程人員到場查驗項目未明訂。</td><td>僅寫「定期督察」，無具體查驗時機。</td><td>依 111 年底要點第三點，明列「基礎開挖完成、鋼筋綁紮完成、混凝土澆置前、重大工法變更」四大節點。</td></tr>
+            <tr><td>Q08</td><td>第二篇：品管組織</td><td class="font-semibold">品管人員兼任現場領班或職安</td><td>品管人員違反專職規定，請重新派任。</td><td>品管人員名字同時出現在工地工程師或安衛管理員欄位。</td><td>查核金額以上工程，品管人員依法必須專職常駐，嚴禁兼任工地主任或安衛人員。</td></tr>
+            <tr><td>Q09</td><td>第二篇：品管組織</td><td class="font-semibold">品管人員合格證照逾期未回訓</td><td>證照超過四年未取得回訓證明，資格不符。</td><td>檢附之品管證書未附每四年至少 36 小時之回訓紀錄。</td><td>送審前確認公共工程品質管理訓練結業證書與回訓證明在有效期限內。</td></tr>
+            <tr><td>Q10</td><td>第二篇：品管組織</td><td class="font-semibold">品管組織圖缺乏專任技師督導連線</td><td>組織圖未呈現技師對工地主任與品管之指導關係。</td><td>將專任工程人員與現場工程師並列或脫節。</td><td>專任工程人員置於頂層指導地位，品管人員獨立於工地主任平行列管。</td></tr>
+            <tr><td>Q11</td><td>第三篇：排版表格</td><td class="font-semibold">跨頁大型表格缺少重複標題列</td><td>抽查表格跨至第 2 頁無欄位標題，無法審閱。</td><td>長達 3 頁的材料管制表，翻頁後無表頭欄位定義。</td><td>選取表格第一列，勾選 Word「在每頁頂端重複標題列 (tblHeader)」。</td></tr>
+            <tr><td>Q12</td><td>第三篇：排版表格</td><td class="font-semibold">目錄與正文頁碼跳頁對不起來</td><td>目錄標註第 5 頁，翻開卻在第 8 頁。</td><td>正文增修後，手動打點點「.....」的目錄未更新。</td><td>使用 Word 樣式庫生成動態目錄，匯出前按 F9 全文更新目錄。</td></tr>
+            <tr><td>Q13</td><td>第三篇：排版表格</td><td class="font-semibold">大綱階層混亂跳號斷層</td><td>章節編號階層跳號，格式未符工程會範本。</td><td>第 3 章底下直接跳 (一)，缺少第一節或「一、」。</td><td>標準五級階層：第一章 ➔ 第一節 ➔ 一、 ➔ (一) ➔ 1. ➔ (1)。</td></tr>
+            <tr><td>Q14</td><td>第三篇：排版表格</td><td class="font-semibold">表格文字跨頁遭水平切半破裂</td><td>表格列被頁尾切成兩半，排版不合格。</td><td>同一列文字一半在上頁、一半被擠到下頁。</td><td>取消勾選「允許列跨頁中斷」，改設為「避免跨頁斷行 (cantSplit)」。</td></tr>
+            <tr><td>Q15</td><td>第三篇：排版表格</td><td class="font-semibold">圖目錄與表目錄編號不連續</td><td>表目錄缺表 2-2，出現兩個表 2-3。</td><td>插表後手動改號，改漏其中一個。</td><td>使用 Word「插入圖表標號」自動管理連續編號。</td></tr>
+            <tr><td>Q16</td><td>第三篇：排版表格</td><td class="font-semibold">頁首頁尾標案名稱與版次不一</td><td>頁首案名抄自舊標案，出現他案名稱。</td><td>複製舊案範本，奇偶頁不同只改了第一頁。</td><td>檢查頁首與頁尾「連結到前一節」，確保全書案名與版次 100% 同步。</td></tr>
+            <tr><td>Q17</td><td>第四篇：材料檢驗</td><td class="font-semibold">未明列 TAF 認證材料實驗室</td><td>材料檢驗委託機構未載明具備 TAF 認證。</td><td>只寫「委託合格實驗室檢驗」，無具體認證標準。</td><td>載明「委託具備全國認證基金會（TAF）認證標誌且認證項目符合規定之試驗機構辦理」。</td></tr>
+            <tr><td>Q18</td><td>第四篇：材料檢驗</td><td class="font-semibold">材料進場送審時效不足 30 天</td><td>材料送審程序未保留足夠審查天數。</td><td>寫材料進場前 7 天送審，監造審查來不及。</td><td>明訂「材料設備於預定進場日前 30 日曆天，檢附型錄、試驗報告提送監造審查」。</td></tr>
+            <tr><td>Q19</td><td>第四篇：材料檢驗</td><td class="font-semibold">鋼筋抽驗頻率與契約規範不符</td><td>鋼筋抽驗組數不足，未依 CNS 560 取樣。</td><td>鋼筋進場 200 噸只取樣 1 組。</td><td>每批 50 公噸或每種規格各取樣 1 組進行抗拉、降伏及彎曲試驗。</td></tr>
+            <tr><td>Q20</td><td>第四篇：材料檢驗</td><td class="font-semibold">混凝土試體抗壓試驗取樣組數不足</td><td>混凝土取樣頻率未達每 100 方取樣標準。</td><td>單日澆置 300 方只做 1 組試體。</td><td>每 100 立方公尺或每日澆置取樣至少 1 組（每組至少 5 顆試體：7天1顆、28天3顆、備用1顆）。</td></tr>
+            <tr><td>Q21</td><td>第四篇：材料檢驗</td><td class="font-semibold">未將送審管制總表納入附件</td><td>缺少材料設備送審管制總表，無法勾稽進場時程。</td><td>只寫文字流程，無橫向追蹤總表。</td><td>第五章後附上完整《材料設備送審管制總表》（含契約項目、送審預定日、核准日、進場預定日）。</td></tr>
+            <tr><td>Q22</td><td>第五篇：停留點</td><td class="font-semibold">缺少關鍵檢驗停留點 (Hold Point) 清單</td><td>檢驗停留點未明確定義，擅自隱蔽屬違約。</td><td>未定義哪些項目須等監造查驗合格才能續行施工。</td><td>明訂五大 Hold Point：基礎開挖完成、鋼筋綁紮完成、混凝土澆置前、結構防水施作前、管線試壓完成。</td></tr>
+            <tr><td>Q23</td><td>第五篇：停留點</td><td class="font-semibold">自主檢查標準無具體公差數據</td><td>檢查標準只寫「符合設計圖說」，過於空洞。</td><td>檢查標準欄位全填「良好」、「依圖施作」。</td><td>全面數值化！如：鋼筋保護層「梁柱 ±10mm、板牆 ±5mm」；模板垂直度「3m 內不大於 3mm」。</td></tr>
+            <tr><td>Q24</td><td>第五篇：停留點</td><td class="font-semibold">自主檢查表項目與施工程序脫鉤</td><td>自主檢查表項目與施工要領步驟不一致。</td><td>施工要領寫 8 個步驟，自主檢查表只列 3 個項目。</td><td>施工要領各關鍵作業環節必須與自主檢查表檢查時機點一對一對應。</td></tr>
+            <tr><td>Q25</td><td>第五篇：停留點</td><td class="font-semibold">未載明自主檢查不合格之即時處置</td><td>自主檢查不合格欄位未規範改善與複查程序。</td><td>只勾選合格，無不合格處置欄位。</td><td>表單結尾須包含「初檢不合格項目說明、缺失改善複查日期與複查合格簽認欄位」。</td></tr>
+            <tr><td>Q26</td><td>第六篇：不合格品</td><td class="font-semibold">未定義嚴重缺失與一般缺失分級標準</td><td>不合格品缺乏分級管制機制。</td><td>所有問題混為一談，無停工通報標準。</td><td>涉及結構安全與隱蔽部分為「嚴重缺失」（立即停工隔離）；外觀瑕疵為「一般缺失」（3日內修復）。</td></tr>
+            <tr><td>Q27</td><td>第六篇：不合格品</td><td class="font-semibold">缺少不合格品實體隔離與標示 SOP</td><td>不合格材料進場如何防範誤用未敘明。</td><td>不合格鋼筋仍堆放在合格料堆旁。</td><td>明訂「設立黃黑警示帶與紅色標籤隔離區，24 小時內運離工地現場並拍照銷案」。</td></tr>
+            <tr><td>Q28</td><td>第六篇：不合格品</td><td class="font-semibold">缺失改善前後未要求同角度彩色照片</td><td>改善報告照片無法辨識是否為同一位置。</td><td>改善前拍近照，改善後拍遠照。</td><td>SOP 規定必須附「改善前、改善中、改善後同角度、同背景之彩色對照照片」。</td></tr>
+            <tr><td>Q29</td><td>第六篇：不合格品</td><td class="font-semibold">矯正措施未包含根本成因分析（魚骨圖）</td><td>矯正措施流於形式只寫「加強宣導」。</td><td>檢討報告只寫「要求工人注意」。</td><td>啟動「人、機、料、法、環」五大面向魚骨圖真因剖析，提出流程防呆對策。</td></tr>
+            <tr><td>Q30</td><td>第六篇：不合格品</td><td class="font-semibold">品質文件未明定五年法定保存年限</td><td>工程紀錄保存年限未符工程會要點規定。</td><td>寫工程完工驗收後歸檔一年。</td><td>依工程會最新要點，所有品管與監造核定紀錄，承造廠商須自完工驗收合格日起妥善保存至少 5 年。</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 表單 23：第二引擎 政府採購法核心申論擬答與履約爭議防呆總表 (文件 24 & 25) -->
+    <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5 shadow-sm">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+        <h2 class="text-base font-bold">【表單 23】第二引擎：政府採購法高頻爭議防呆與三段式申論擬答知識總表（來源：文件 24 &amp; 25）</h2>
+        <span class="text-xs px-2 py-0.5 rounded bg-sky-500/20 text-sky-500 font-medium">熱銷 32 套數位手冊核心精華｜實務防呆＋高普考升資考雙棲</span>
+      </div>
+      <div class="overflow-x-auto text-xs">
+        <table>
+          <thead>
+            <tr>
+              <th>核心法條與主題</th>
+              <th>法定構成要件與比例原則關鍵（大前提）</th>
+              <th>工務所／機關實務最常踩雷情境（小前提）</th>
+              <th>標準行政救濟與契約防呆SOP（結論與擬答核心）</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="font-bold text-rose-400">第 101 條第 1 項<br>不良廠商停權處分<br>(第 3、8、10、12 款)</td>
+              <td>須符合<strong>「情節重大」</strong>與<strong>「比例原則（第 101 條第 4 項）」</strong>；機關作成通知前，<strong>必須給予廠商陳述意見之機會（第 101 條第 3 項）</strong>，並經採購工作及審查小組認定。</td>
+              <td>1. 機關未給予陳述意見即直接發函刊登政府採購公報。<br>2. 廠商發現施工或材料瑕疵已主動通報改善，仍被依第 3 款「擅自減省工料」提報停權。</td>
+              <td>1. <strong>程序防禦</strong>：檢核機關是否踐行「陳述意見通知」與「審查小組會議」。<br>2. <strong>實體防禦</strong>：舉證非出於故意、已積極修復且未危及結構安全，主張不符「情節重大」。<br>3. <strong>救濟時效</strong>：收受通知次日起 <strong>20 日內提出異議</strong>；異議處理結果不服，<strong>15 日內向工程會申訴會提申訴</strong>（法定不變期間）。</td>
+            </tr>
+            <tr>
+              <td class="font-bold text-amber-400">第 53 條 &amp; 第 54 條<br>超底價決標與減價程序</td>
+              <td>合於招標文件規定之投標廠商最低標價超過底價時，得洽最低標優先減價 1 次；仍超底價則由全體合規廠商比減價格（不逾 3 次）。</td>
+              <td>比減價格後仍超過底價，主辦工程師在未敘明緊急情事或未經原底價核定人核准下，擅自宣布廢標或超底價決標（逾 8% 門檻）。</td>
+              <td>1. <strong>未逾底價 8%</strong>：確有緊急情事需決標時，應經原底價核定人或其授權人員核准。<br>2. <strong>查核金額以上且逾底價 4%（未逾 8%）</strong>：須先報請上級機關核准後方得決標。<br>3. <strong>逾底價 8%</strong>：法無通融空間，一律廢標重行招標。</td>
+            </tr>
+            <tr>
+              <td class="font-bold text-emerald-400">第 58 條<br>標價偏低顯不合理之處理</td>
+              <td>總標價低於底價 <strong>80%</strong>（或部分標價低於 70%），顯不合理，有降低品質、不能誠信履約之虞時，應限期通知廠商提出合理說明或擔保。</td>
+              <td>廠商報價低於底價 70%，機關未給廠商說明機會即直接判定廢標；或廠商說明明顯不合理，機關卻未要求繳納差額保證金即予決標。</td>
+              <td>依工程會《依政府採購法第 58 條處理總標價低於底價百分之八十案件之執行程序》：<br>1. <strong>低於底價 70%~80%</strong>：限期通知提出說明，合理即決標；不合理則通知繳納差額保證金。<br>2. <strong>低於底價 70%</strong>：說明合理則免繳差額保證金決標；說明不合理則<strong>不通知繳納差額保證金，直接不決標予該廠商</strong>，以次低標為最低標。</td>
+            </tr>
+            <tr>
+              <td class="font-bold text-sky-400">第 72 條<br>驗收不符之減價收受</td>
+              <td>驗收結果與契約、圖說、貨樣規定不符者，應通知限期改善、拆除、重作、退貨或換貨。其<strong>不妨礙安全及使用需求，亦無減少通常效用或契約預定效用，經機關檢討不必拆換或拆換確有困難者</strong>，得於必要時減價收受。</td>
+              <td>混凝土強度不足影響結構安全，卻試圖辦理減價收受；或查核金額以上工程未報上級機關核准即自行核定減價收受。</td>
+              <td>1. <strong>四大法定前提缺一不可</strong>：不妨礙安全、不妨礙使用需求、無減少通常/預定效用、拆換確有困難。<br>2. <strong>核准層級</strong>：其在<strong>查核金額以上之採購，應先報經上級機關核准</strong>。<br>3. <strong>扣款與懲罰性違約金</strong>：按不符項目標價減價，並依契約加計懲罰性違約金。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 表單 24：全案 35 項交付資產交接清冊與功能驗收索引總表 (文件 09, 30, 34) -->
+    <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5 shadow-sm">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+        <h2 class="text-base font-bold">【表單 24】全案 35 項交付資產交接清冊與功能驗收索引總表（來源：文件 09, 30, 34）</h2>
+        <span class="text-xs px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-500 font-medium">35/35 核心交付物 100% 完稿就緒</span>
+      </div>
+      <div class="overflow-x-auto text-xs">
+        <table>
+          <thead>
+            <tr>
+              <th>編號</th>
+              <th>檔案路徑與資產名稱</th>
+              <th>所屬生命周期階段</th>
+              <th>核心商業功能與驗收狀態</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>00</td><td><code>00_變現總控與決策紀錄.md</code></td><td>全期總控 (V3.5)</td><td>專案單一真相來源 (SSOT)、三大決策閘門與財務總結算紀錄</td></tr>
+            <tr><td>01~09</td><td><code>01_機會評分表.md</code> ～ <code>09_交付清單與索引.md</code></td><td>階段一：基礎建置</td><td>候選機會評分、客戶痛點、產品規格、定價試算、銷售漏斗、法規查核、收入追蹤CSV、90天看板</td></tr>
+            <tr><td>10~15</td><td><code>output/10_客戶訪談問卷.md</code> ～ <code>output/15_第一階段收斂決策紀錄.md</code></td><td>階段一：市場驗證</td><td>The Mom Test 10 題問卷、17 欄訪談 CSV、AB 方案對照、驗證儀表板 CSV、首週行動劇本、Gate 1 決策</td></tr>
+            <tr><td>16~20</td><td><code>output/16_A4一頁紙客戶展示對照單.md</code> ～ <code>output/20_試行專案完工驗收與客戶評價回饋單.md</code></td><td>階段二：服務閉環</td><td>A4 前後對照單、10 位名單與破冰話術、訪談前查核卡、保密委託確認書、完工驗收與 5 星評價單</td></tr>
+            <tr><td>21~23</td><td><code>output/21_首筆試行案件端到端交付實戰紀錄.md</code> ～ <code>output/23_首筆試行案件46分鐘極速交付執行報告.md</code></td><td>階段二：極速交付</td><td>46 分鐘端到端交付 SOP、三場訪談沙盤推演、真實執行日誌與合規初審報告</td></tr>
+            <tr><td>24~25</td><td><code>output/24_政府採購法常見契約爭議與申論實務防呆精選集.md</code> &amp; <code>25_...銷售頁與推廣套件.md</code></td><td>階段二：第二引擎</td><td>政府採購法第 101/53/58/72 條申論與防呆手冊、銷售文案與雙引擎交叉變現漏斗</td></tr>
+            <tr><td>26~28</td><td><code>output/26_職業安全衛生管理計畫書_標準大綱與自動檢查範例.md</code> ～ <code>28_...雙計畫書統包執行報告.md</code></td><td>階段二：雙本統包</td><td>職安衛計畫書標準大綱、雙計畫書開工統包報價單 (NT$ 3,200)、85 分鐘雙本統包交付報告</td></tr>
+            <tr><td>29~31</td><td><code>output/29_公共工程計畫書送審常見退件30避坑實戰手冊.md</code> ～ <code>31_第一階段結算與第二階段啟動決策報告.md</code></td><td>階段二：知識封裝</td><td>六大篇目 30 道退件避坑百科、全階段資產總索引、Gate 1 正式結算報告</td></tr>
+            <tr><td>32~35</td><td><code>output/32_第二階段結算...md</code> ～ <code>output/35_專案全生命週期戰情室儀表板.html</code></td><td>階段三：擴張與結案</td><td>Gate 2 結算、Gate 3 結算、90 天全生命週期完工決算報告書、24 張全表單互動戰情室 HTML</td></tr>
+            <tr><td>核心引擎</td><td><code>web_app.py</code>, <code>src/checker.py</code>, <code>src/compliance_rules.py</code>, <code>generate_full_quality_plan.py</code>, <code>generate_safety_plan.py</code></td><td>全自動工程引擎</td><td>FastAPI 機構級 Web 平台 (<code>monetize.chihyuan.date</code>)、10 大有效法規與 10 大退件地雷引擎、雙計畫書生成器</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </section>
+
+  <script>
+    let showingAll = false;
+
+    function switchTab(tabId) {
+      showingAll = false;
+      document.getElementById('toggleAllBtn').textContent = '展開全部 24 張表單';
+      document.querySelectorAll('.tab-section').forEach(sec => {
+        sec.classList.add('hidden');
+      });
+      document.getElementById(tabId).classList.remove('hidden');
+
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      document.getElementById('btn-' + tabId).classList.add('active');
+    }
+
+    function toggleAllTabs() {
+      showingAll = !showingAll;
+      const btn = document.getElementById('toggleAllBtn');
+      if (showingAll) {
+        document.querySelectorAll('.tab-section').forEach(sec => sec.classList.remove('hidden'));
+        btn.textContent = '收合為分頁檢視';
+      } else {
+        switchTab('tab1');
+      }
+    }
+
+    function filterTables(query) {
+      const q = query.trim().toLowerCase();
+      if (q.length > 0 && !showingAll) {
+        document.querySelectorAll('.tab-section').forEach(sec => sec.classList.remove('hidden'));
+        document.getElementById('toggleAllBtn').textContent = '收合為分頁檢視';
+        showingAll = true;
+      }
+      document.querySelectorAll('tbody tr').forEach(row => {
+        const text = row.innerText.toLowerCase();
+        row.style.display = text.includes(q) ? '' : 'none';
+      });
+    }
+  </script>
+</body>
+</html>
